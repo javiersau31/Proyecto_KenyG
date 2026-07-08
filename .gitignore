@@ -1,4 +1,40 @@
+# ==========================
+# Backend
+# ==========================
+back/node_modules/
 back/.env
-back/node_modules
-front/node_modules
+
+# ==========================
+# Frontend (Angular)
+# ==========================
+front/node_modules/
+front/dist/
+front/.angular/
+front/.angular/cache/
+front/tmp/
+front/out-tsc/
+front/bazel-out/
+front/coverage/
+
+# ==========================
+# Logs
+# ==========================
 *.log
+npm-debug.log
+yarn-error.log
+
+# ==========================
+# IDE
+# ==========================
+.vscode/
+.idea/
+.project
+.classpath
+.settings/
+.history/
+
+# ==========================
+# Sistema
+# ==========================
+.DS_Store
+Thumbs.db
