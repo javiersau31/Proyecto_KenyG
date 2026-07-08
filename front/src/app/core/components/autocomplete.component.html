@@ -1,0 +1,63 @@
+<div class="relative autocomplete-container">
+
+  <!-- INPUT -->
+  <input
+    type="text"
+    [(ngModel)]="termino"
+    (ngModelChange)="onInput()"
+    (blur)="cerrar()"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    class="w-full border rounded-lg px-3 py-2
+         focus:ring-2 focus:ring-[#005EB8]
+         disabled:bg-slate-100 disabled:cursor-not-allowed"
+    
+  />
+
+  <!-- DROPDOWN -->
+
+  <div
+    *ngIf="mostrar && resultados.length"
+    class="absolute z-50 w-full bg-white border rounded-lg shadow mt-1 max-h-60 overflow-y-auto"
+    >
+      <ng-container *ngFor="let item of resultados">
+
+        <div (click)="seleccionar(item)" class="px-3 py-2 hover:bg-slate-100 cursor-pointer">
+
+          <ng-container
+            *ngTemplateOutlet="itemTemplate ? itemTemplate : defaultTemplate; context: { $implicit: item }">
+          </ng-container>
+
+        </div>
+
+      </ng-container>
+  </div>
+
+</div>
+<div
+  *ngIf="mostrar && resultados.length"
+  class="absolute z-50 w-full bg-white border rounded-lg shadow mt-1 max-h-60 overflow-y-auto"
+>
+  <ng-container *ngFor="let item of resultados">
+
+    <div
+      (click)="seleccionar(item)"
+      class="px-3 py-2 hover:bg-slate-100 cursor-pointer"
+    >
+
+      <ng-container
+        *ngTemplateOutlet="
+          itemTemplate ? itemTemplate : defaultTemplate;
+          context: { $implicit: item }
+        "
+      >
+      </ng-container>
+
+    </div>
+
+  </ng-container>
+</div>
+
+<ng-template #defaultTemplate let-item>
+  {{ item[labelKey] }}
+</ng-template>
