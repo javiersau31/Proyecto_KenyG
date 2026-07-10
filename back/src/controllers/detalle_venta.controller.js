@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require('../config/database');
 
 const obtenerDetallesPorVenta = async (req, res) => {
   const { id_venta } = req.params;

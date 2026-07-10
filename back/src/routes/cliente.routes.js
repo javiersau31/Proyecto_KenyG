@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/connection');
 
-const{obtenerClientes, obtenerClientePorId, crearCliente, actualizarCliente, eliminarCliente} = require('../controladores/clientes.controlador');
-const verificarToken = require('../middleware');
+const{obtenerClientes, obtenerClientePorId, crearCliente, actualizarCliente, eliminarCliente} = require('../controllers/clientes.controller');
+const verificarToken = require('../middlewares/auth.middleware');
 
 router.get('/',verificarToken ,obtenerClientes);
 router.get('/:id',verificarToken ,obtenerClientePorId);

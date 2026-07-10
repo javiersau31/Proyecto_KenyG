@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db/connection');
-const verificarToken = require('../middleware');
+const verificarToken = require('../middlewares/auth.middleware');
 
-const{ obtenerDetallesPorVenta, eliminarDetalle, editarDetalle } = require('../controladores/detalle_venta.controlador');
+const{ obtenerDetallesPorVenta, eliminarDetalle, editarDetalle } = require('../controllers/detalle_venta.controller');
 
 router.get('/detalle/:id_venta',verificarToken ,obtenerDetallesPorVenta);
 
