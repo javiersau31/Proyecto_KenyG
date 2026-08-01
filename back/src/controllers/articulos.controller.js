@@ -6,14 +6,7 @@ const { validarArticulo } = require('../validators/articulos.validators');
 exports.obtenerArticulos = async (req, res) => {
     try {
 
-      //validacion de id
-      if (Number.isNaN(Number(id))) {
-            return res.status(400).json({
-                mensaje: 'El ID del artículo es inválido.'
-            });
-        }
-
-        const [articulos] = await db.query(
+        const [articulos] = await conexion.query(
             `SELECT
                 a.id_articulo,
                 a.nombre,
@@ -51,7 +44,7 @@ exports.obtenerArticuloPorId = async (req, res) => {
 
         const { id } = req.params;
 
-        const [articulos] = await db.query(
+        const [articulos] = await conexion.query(
             `SELECT
                 id_articulo,
                 nombre,
@@ -109,7 +102,7 @@ exports.crearArticulo = async (req, res) => {
         } = validacion.datos;
 
         // Verificar categoría
-        const [categoria] = await db.query(
+        const [categoria] = await conexion.query(
             `SELECT id_categoria
              FROM categorias
              WHERE id_categoria = ?
@@ -124,7 +117,7 @@ exports.crearArticulo = async (req, res) => {
         }
 
         // Verificar nombre repetido
-        const [articulo] = await db.query(
+        const [articulo] = await conexion.query(
             `SELECT id_articulo
              FROM articulos
              WHERE LOWER(nombre)=LOWER(?)
@@ -138,7 +131,7 @@ exports.crearArticulo = async (req, res) => {
             });
         }
 
-        const [resultado] = await db.query(
+        const [resultado] = await conexion.query(
             `INSERT INTO articulos
             (nombre, descripcion, precio, existencia, id_categoria)
             VALUES (?, ?, ?, ?, ?)`,
@@ -201,7 +194,7 @@ exports.actualizarArticulo = async (req, res) => {
         } = validacion.datos;
 
         // Verificar que el artíiulo exista
-        const [articuloActual] = await db.query(
+        const [articuloActual] = await conexion.query(
             `SELECT id_articulo
              FROM articulos
              WHERE id_articulo = ?
@@ -216,7 +209,7 @@ exports.actualizarArticulo = async (req, res) => {
         }
 
         // Verificar que la categoria exista
-        const [categoria] = await db.query(
+        const [categoria] = await conexion.query(
             `SELECT id_categoria
              FROM categorias
              WHERE id_categoria = ?
@@ -231,7 +224,7 @@ exports.actualizarArticulo = async (req, res) => {
         }
 
         // Verificar nombre duplicado
-        const [articuloDuplicado] = await db.query(
+        const [articuloDuplicado] = await conexion.query(
             `SELECT id_articulo
              FROM articulos
              WHERE LOWER(nombre) = LOWER(?)
@@ -247,7 +240,7 @@ exports.actualizarArticulo = async (req, res) => {
         }
 
         //Actualizar articulo
-        await db.query(
+        await conexion.query(
             `UPDATE articulos
              SET
                 nombre = ?,
@@ -282,7 +275,7 @@ exports.actualizarArticulo = async (req, res) => {
 
 };
 
-// Desactivar un artículo (soft delete)
+// Desactivar un artículo (soft delete que pediste jefazo)
 exports.desactivarArticulo = async (req,res)=>{
 
     try{
@@ -295,7 +288,7 @@ exports.desactivarArticulo = async (req,res)=>{
             });
         }
 
-        await db.query(
+        await conexion.query(
             `UPDATE articulos
              SET activo = FALSE
              WHERE id_articulo = ?`,
@@ -331,7 +324,7 @@ exports.activarArticulo = async (req, res) => {
             });
         }
 
-        await db.query(
+        await conexion.query(
 
             `UPDATE articulos
              SET activo = TRUE

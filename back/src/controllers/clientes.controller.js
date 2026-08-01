@@ -1,100 +1,250 @@
-const db = require('../config/databse');
-const bcrypt = require('bcryptjs');
+const conexion = require('../config/database');
+const MESSAGES = require('../constants/messages');
+const { validarCliente } = require('../validators/clientes.validators');
 
-const obtenerClientes = async (req, res) => {
-  try {
-    const [clientes] = await db.query(
-      'SELECT id_cliente,nombre,direccion,email,telefono from clientes WHERE tipo = ?', ['cliente']
-    );
-    res.json(clientes);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener clientes' });
-  }
-}
-const obtenerClientePorId = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const [[cliente]] = await db.query('SELECT id_cliente,nombre,email,telefono,direccion,usuario FROM clientes WHERE id_cliente = ?', [id]);
-    if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-    res.json(cliente);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el cliente' });
-  }
-};
+// Obtener todos los clientes activos
+exports.obtenerClientes = async (req, res) => {
 
-// Crear cliente
-const crearCliente = async (req, res) => {
-  const { nombre, direccion, telefono, email,tipo } = req.body;
-  let { usuario, contrasena } = req.body; 
+    try {
 
-  if (!nombre || nombre.trim() === '' || !direccion || direccion.trim() === '' || !telefono || telefono.trim() === '' || !email || email.trim() === '') {
-    return res.status(400).json({ error: 'Faltan datos necesarios' });
-  }
+        const [clientes] = await conexion.query(
+            `SELECT
+                id_cliente,
+                nombre,
+                direccion,
+                telefono,
+                correo
+            FROM clientes
+            WHERE activo = TRUE
+            ORDER BY nombre ASC`
+        );
 
-   if (!usuario) {
-    usuario = `user_${Date.now()}`;
-  }
-  if (!contrasena) {
-    contrasena = 'temporal123';
-  }
+        res.json(clientes);
 
-  try {
-    const hashedPassword = await bcrypt.hash(contrasena, 10);
+    } catch (error) {
 
-    await db.query(
-      'INSERT INTO clientes (nombre, direccion, telefono, email, usuario, contrasena, tipo) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [nombre.trim(), direccion.trim(), telefono.trim(), email.trim(), usuario, hashedPassword , tipo || 'cliente']
-    );
+        console.error(error);
 
-    res.json({ success: true, message: 'Cliente creado correctamente' });
-  } catch (error) {
-    console.error('ERROR AL CREAR CLIENTE:', error);
-    res.status(500).json({ error: 'Error al crear cliente' });
-  }
-};
+        res.status(500).json({
+            mensaje: MESSAGES.ERROR_INTERNO
+        });
 
-// Actualizar cliente
-const actualizarCliente = async (req, res) => {
-  const { id } = req.params;
-  const { nombre, direccion, telefono, email } = req.body;
-
-  if (!nombre || nombre.trim() === '' || !direccion || direccion.trim() === '' || !telefono || telefono.trim() === '' || !email || email.trim() === '') {
-    return res.status(400).json({ error: 'Faltan datos' });  }
-
-  try {
-    await db.query(
-      'UPDATE clientes SET nombre = ?, direccion = ?, telefono = ?, email = ? WHERE id_cliente = ?',
-      [nombre.trim(), direccion.trim(), telefono.trim(), email.trim(), id]
-    );
-    res.json({ success: true, message: 'Cliente actualizado correctamente' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al actualizar cliente' });
-  }
-};
-
-// Eliminar cliente
-const eliminarCliente = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const [ventas] = await db.query('SELECT * FROM ventas WHERE id_cliente = ?', [id]);
-    if (ventas.length > 0) {
-      return res.status(400).json({ error: 'Este cliente tiene ventas registradas y no puede ser eliminado.' });
     }
-    await db.query('DELETE FROM clientes WHERE id_cliente = ?', [id]);
-    res.json({ success: true, message: 'Cliente eliminado correctamente' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al eliminar el cliente' });
-  }
+
 };
 
-module.exports = {
-  obtenerClientes,
-  obtenerClientePorId,
-  crearCliente,
-  actualizarCliente,
-  eliminarCliente
+// Obtener un cliente por ID
+exports.obtenerClientePorId = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (Number.isNaN(Number(id))) {
+            return res.status(400).json({
+                mensaje: 'El ID del cliente es inválido.'
+            });
+        }
+
+        const [clientes] = await conexion.query(
+            `SELECT
+                id_cliente,
+                nombre,
+                direccion,
+                telefono,
+                correo
+            FROM clientes
+            WHERE id_cliente = ?
+            AND activo = TRUE`,
+            [id]
+        );
+
+        if (clientes.length === 0) {
+            return res.status(404).json({
+                mensaje: MESSAGES.NO_ENCONTRADO
+            });
+        }
+
+        res.json(clientes[0]);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            mensaje: MESSAGES.ERROR_INTERNO
+        });
+
+    }
+
+};
+
+// Crear un nuevo cliente (lo crea el admin/vendedor desde el panel, sin login, esta parte no me quedo clara pero pues tu me dices que onda con los roles y que puede hacer cada uno)
+exports.crearCliente = async (req, res) => {
+
+    try {
+
+        const validacion = validarCliente(req.body);
+
+        if (!validacion.valido) {
+            return res.status(400).json({
+                mensaje: validacion.mensaje
+            });
+        }
+
+        const { nombre, direccion, telefono, correo } = validacion.datos;
+
+        const [resultado] = await conexion.query(
+            `INSERT INTO clientes (nombre, direccion, telefono, correo)
+             VALUES (?, ?, ?, ?)`,
+            [nombre, direccion, telefono, correo]
+        );
+
+        return res.status(201).json({
+            mensaje: 'Cliente creado correctamente.',
+            id_cliente: resultado.insertId
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            mensaje: MESSAGES.ERROR_INTERNO
+        });
+
+    }
+
+};
+
+// Actualizar un cliente
+exports.actualizarCliente = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (Number.isNaN(Number(id))) {
+            return res.status(400).json({
+                mensaje: 'El ID del cliente es inválido.'
+            });
+        }
+
+        const validacion = validarCliente(req.body);
+
+        if (!validacion.valido) {
+            return res.status(400).json({
+                mensaje: validacion.mensaje
+            });
+        }
+
+        const { nombre, direccion, telefono, correo } = validacion.datos;
+
+        const [clienteActual] = await conexion.query(
+            `SELECT id_cliente
+             FROM clientes
+             WHERE id_cliente = ?
+             AND activo = TRUE`,
+            [id]
+        );
+
+        if (clienteActual.length === 0) {
+            return res.status(404).json({
+                mensaje: MESSAGES.NO_ENCONTRADO
+            });
+        }
+
+        await conexion.query(
+            `UPDATE clientes
+             SET nombre = ?, direccion = ?, telefono = ?, correo = ?
+             WHERE id_cliente = ?`,
+            [nombre, direccion, telefono, correo, id]
+        );
+
+        return res.status(200).json({
+            mensaje: 'Cliente actualizado correctamente.'
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            mensaje: MESSAGES.ERROR_INTERNO
+        });
+
+    }
+
+};
+
+// Desactivar un cliente (soft delete de nuevo)
+exports.desactivarCliente = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (Number.isNaN(Number(id))) {
+            return res.status(400).json({
+                mensaje: 'El ID del cliente es inválido.'
+            });
+        }
+
+        await conexion.query(
+            `UPDATE clientes
+             SET activo = FALSE
+             WHERE id_cliente = ?`,
+            [id]
+        );
+
+        return res.json({
+            mensaje: 'Cliente desactivado correctamente.'
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            mensaje: MESSAGES.ERROR_INTERNO
+        });
+
+    }
+
+};
+
+// Activar un cliente
+exports.activarCliente = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        if (Number.isNaN(Number(id))) {
+            return res.status(400).json({
+                mensaje: 'El ID del cliente es inválido.'
+            });
+        }
+
+        await conexion.query(
+            `UPDATE clientes
+             SET activo = TRUE
+             WHERE id_cliente = ?`,
+            [id]
+        );
+
+        return res.json({
+            mensaje: 'Cliente activado correctamente.'
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            mensaje: MESSAGES.ERROR_INTERNO
+        });
+
+    }
+
 };

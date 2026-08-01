@@ -3,9 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
-    const { usuario, contrasena } = req.body;
 
-    if (!usuario || !contrasena) {
+    // El campo se llama "usuario" en el body (así lo manda el front),
+    // pero en la tabla usuarios NO existe apa una columna usuario,
+    // solo "correo". pero aqui ya lo puse pa que busque por correo
+    const { usuario: correo, contrasena } = req.body;
+
+    if (!correo || !contrasena) {
         return res.status(400).json({
             mensaje: 'Usuario y contraseña son obligatorios.'
         });
@@ -18,15 +22,14 @@ exports.login = async (req, res) => {
                 u.id_usuario,
                 u.nombre,
                 u.correo,
-                u.usuario,
                 u.contrasena,
                 u.activo,
                 r.nombre AS rol
             FROM usuarios u
             INNER JOIN roles r
                 ON u.id_rol = r.id_rol
-            WHERE u.usuario = ?`,
-            [usuario]
+            WHERE u.correo = ?`,
+            [correo]
         );
 
         if (usuarios.length === 0) {
