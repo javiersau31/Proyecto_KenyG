@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ArticulosService, Articulo, Categoria } from '../servicios/articulos.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
   standalone: true,
   templateUrl: './articulos.component.html',
   styleUrl: './articulos.component.css',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
 })
 export class ArticulosComponent implements OnInit {
   articulos: Articulo[] = [];
@@ -19,7 +19,8 @@ export class ArticulosComponent implements OnInit {
   modoEditar: boolean = false;
   idEditando: number | null = null;
   articuloAEliminar: number | null = null;
-  pestaniaActiva: 'formulario' | 'tabla' = 'formulario';
+  mostrarFormulario: boolean = false;
+  busqueda: string = '';
 
   constructor(private servicio: ArticulosService, private fb: FormBuilder, private toastr: ToastrService) {
     this.articuloForm = this.fb.group({
@@ -34,6 +35,28 @@ export class ArticulosComponent implements OnInit {
   ngOnInit(): void {
     this.obtenerArticulos();
     this.obtenerCategorias();
+  }
+
+  get articulosFiltrados(): Articulo[] {
+    if (!this.busqueda.trim()) return this.articulos;
+    const q = this.busqueda.toLowerCase();
+    return this.articulos.filter(a =>
+      a.nombre.toLowerCase().includes(q) ||
+      (a.descripcion?.toLowerCase().includes(q)) ||
+      (a.categoria?.toLowerCase().includes(q))
+    );
+  }
+
+  get articulosConStock(): number {
+    return this.articulos.filter(a => a.existencia > 10).length;
+  }
+
+  get articulosStockBajo(): number {
+    return this.articulos.filter(a => a.existencia > 0 && a.existencia <= 10).length;
+  }
+
+  get articulosSinStock(): number {
+    return this.articulos.filter(a => a.existencia === 0).length;
   }
 
   obtenerArticulos() {
@@ -61,7 +84,7 @@ export class ArticulosComponent implements OnInit {
           this.toastr.success('Artículo actualizado correctamente', 'Éxito');
           this.obtenerArticulos();
           this.cancelarEditar();
-          this.pestaniaActiva = 'tabla';
+          this.mostrarFormulario = false;
         },
         error: (err) => {
           this.toastr.error(err.error?.mensaje || 'Error al actualizar', 'Error');
@@ -73,7 +96,7 @@ export class ArticulosComponent implements OnInit {
           this.toastr.success('Artículo creado correctamente', 'Éxito');
           this.obtenerArticulos();
           this.articuloForm.reset();
-          this.pestaniaActiva = 'tabla';
+          this.mostrarFormulario = false;
         },
         error: (err) => {
           this.toastr.error(err.error?.mensaje || 'Error al crear artículo', 'Error');
@@ -86,7 +109,7 @@ export class ArticulosComponent implements OnInit {
     this.modoEditar = true;
     this.idEditando = articulo.id_articulo!;
     this.articuloForm.patchValue(articulo);
-    this.pestaniaActiva = 'formulario';
+    this.mostrarFormulario = true;
   }
 
   cancelarEditar() {
