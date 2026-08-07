@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../config/database');
 const verificarToken = require('../middlewares/auth.middleware');
 
 const{ obtenerDetallesPorVenta, eliminarDetalle, editarDetalle } = require('../controllers/detalle_venta.controller');

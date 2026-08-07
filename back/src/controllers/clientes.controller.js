@@ -1,4 +1,4 @@
-const db = require('../config/databse');
+const db = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 const obtenerClientes = async (req, res) => {

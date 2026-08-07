@@ -1,152 +1,211 @@
-<div class="min-h-screen bg-gray-100 p-6">
-  <div class="bg-white p-6 rounded-xl shadow-lg max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold text-blue-900 mb-6 text-center">Gestion de Artículos</h2>
+<div class="min-h-screen bg-gray-50 p-4 md:p-8">
+  <div class="max-w-6xl mx-auto">
 
-
-    <div class="flex border-b mb-6">
-      <button
-        class="px-4 py-2 -mb-px border-b-2 font-medium focus:outline-none"
-        [ngClass]="{
-          'border-blue-600 text-blue-600': pestaniaActiva === 'formulario',
-          'border-transparent text-gray-500 hover:text-gray-700': pestaniaActiva !== 'formulario'
-        }"
-        (click)="pestaniaActiva = 'formulario'"
-      >
-        Formulario
-      </button>
-      <button
-        class="px-4 py-2 -mb-px border-b-2 font-medium focus:outline-none"
-        [ngClass]="{
-          'border-blue-600 text-blue-600': pestaniaActiva === 'tabla',
-          'border-transparent text-gray-500 hover:text-gray-700': pestaniaActiva !== 'tabla'
-        }"
-        (click)="pestaniaActiva = 'tabla'"
-      >
-        Tabla
-      </button>
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800">Artículos</h1>
+      <p class="text-gray-500 mt-1">Gestiona el inventario de productos</p>
     </div>
 
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- FORMULARIO -->
+      <!-- FORMULARIO -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 class="text-lg font-semibold text-gray-700 mb-5">
+            {{ modoEditar ? '✏️ Editar artículo' : '➕ Nuevo artículo' }}
+          </h2>
 
-     <div *ngIf="pestaniaActiva === 'formulario'">
-    <form [formGroup]="articuloForm" (ngSubmit)="guardarArticulo()" class="grid gap-4 mb-8">
-      <div>
-        <label class="block font-medium text-gray-700 mb-1">Nombre:</label>
-        <input
-          formControlName="nombre"
-          type="text"
-          class="w-full border border-gray-300 rounded-md px-4 py-2"
-          [class.border-red-500]="articuloForm.get('nombre')?.invalid && articuloForm.get('nombre')?.touched"
-        />
-        <div *ngIf="articuloForm.get('nombre')?.invalid && articuloForm.get('nombre')?.touched" class="text-red-600 text-sm mt-1">
-          El nombre es obligatorio.
+          <form [formGroup]="articuloForm" (ngSubmit)="guardarArticulo()" class="flex flex-col gap-4">
+
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Nombre *</label>
+              <input
+                formControlName="nombre"
+                type="text"
+                placeholder="Ej. Coca Cola 600ml"
+                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                [class.border-red-400]="articuloForm.get('nombre')?.invalid && articuloForm.get('nombre')?.touched"
+                [class.border-gray-300]="!(articuloForm.get('nombre')?.invalid && articuloForm.get('nombre')?.touched)"
+              />
+              <p *ngIf="articuloForm.get('nombre')?.invalid && articuloForm.get('nombre')?.touched" class="text-red-500 text-xs mt-1">El nombre es obligatorio.</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Descripción</label>
+              <input
+                formControlName="descripcion"
+                type="text"
+                placeholder="Descripción breve"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              />
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Precio *</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2 text-gray-400 text-sm">$</span>
+                  <input
+                    formControlName="precio"
+                    type="number"
+                    placeholder="0.00"
+                    class="w-full border rounded-lg pl-6 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    [class.border-red-400]="articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched"
+                    [class.border-gray-300]="!(articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched)"
+                  />
+                </div>
+                <p *ngIf="articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched" class="text-red-500 text-xs mt-1">Precio inválido.</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Existencia *</label>
+                <input
+                  formControlName="existencia"
+                  type="number"
+                  placeholder="0"
+                  class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  [class.border-red-400]="articuloForm.get('existencia')?.invalid && articuloForm.get('existencia')?.touched"
+                  [class.border-gray-300]="!(articuloForm.get('existencia')?.invalid && articuloForm.get('existencia')?.touched)"
+                />
+                <p *ngIf="articuloForm.get('existencia')?.invalid && articuloForm.get('existencia')?.touched" class="text-red-500 text-xs mt-1">Existencia inválida.</p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Categoría *</label>
+              <select
+                formControlName="id_categoria"
+                class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-white"
+                [class.border-red-400]="articuloForm.get('id_categoria')?.invalid && articuloForm.get('id_categoria')?.touched"
+                [class.border-gray-300]="!(articuloForm.get('id_categoria')?.invalid && articuloForm.get('id_categoria')?.touched)"
+              >
+                <option value="">-- Selecciona --</option>
+                <option *ngFor="let cat of categorias" [value]="cat.id_categoria">{{ cat.nombre }}</option>
+              </select>
+              <p *ngIf="articuloForm.get('id_categoria')?.invalid && articuloForm.get('id_categoria')?.touched" class="text-red-500 text-xs mt-1">La categoría es obligatoria.</p>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+              <button
+                type="submit"
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg text-sm transition"
+              >
+                {{ modoEditar ? 'Actualizar' : 'Crear artículo' }}
+              </button>
+              <button
+                type="button"
+                *ngIf="modoEditar"
+                (click)="cancelarEditar()"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg text-sm transition"
+              >
+                Cancelar
+              </button>
+            </div>
+
+          </form>
         </div>
       </div>
 
-      <div>
-        <label class="block font-medium text-gray-700 mb-1">Descripción:</label>
-        <input
-          formControlName="descripcion"
-          type="text"
-          class="w-full border border-gray-300 rounded-md px-4 py-2"
-          [class.border-red-500]="articuloForm.get('descripcion')?.invalid && articuloForm.get('descripcion')?.touched"
-        />
-         <div *ngIf="articuloForm.get('descripcion')?.invalid && articuloForm.get('descripcion')?.touched" class="text-red-600 text-sm mt-1">
-           La descripcion es obligatoria.
+      <!-- TABLA -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+          <!-- Header tabla -->
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-700">Inventario</h2>
+            <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+              {{ articulos.length }} artículo{{ articulos.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <!-- Tabla desktop -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-500 uppercase text-xs tracking-wider">
+                <tr>
+                  <th class="px-6 py-3 text-left">Artículo</th>
+                  <th class="px-6 py-3 text-left">Categoría</th>
+                  <th class="px-6 py-3 text-right">Precio</th>
+                  <th class="px-6 py-3 text-center">Stock</th>
+                  <th class="px-6 py-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <tr *ngFor="let art of articulos" class="hover:bg-gray-50 transition">
+                  <td class="px-6 py-4">
+                    <p class="font-medium text-gray-800">{{ art.nombre }}</p>
+                    <p class="text-gray-400 text-xs mt-0.5">{{ art.descripcion }}</p>
+                  </td>
+                  <td class="px-6 py-4">
+                    <span class="bg-indigo-50 text-indigo-600 text-xs font-medium px-2 py-1 rounded-full">
+                      {{ art.categoria || '—' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right font-semibold text-gray-700">
+                    ${{ art.precio | number:'1.2-2' }}
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="text-xs font-semibold px-2 py-1 rounded-full"
+                      [class.bg-green-100]="art.existencia > 10"
+                      [class.text-green-700]="art.existencia > 10"
+                      [class.bg-yellow-100]="art.existencia > 0 && art.existencia <= 10"
+                      [class.text-yellow-700]="art.existencia > 0 && art.existencia <= 10"
+                      [class.bg-red-100]="art.existencia === 0"
+                      [class.text-red-700]="art.existencia === 0"
+                    >
+                      {{ art.existencia }} uds.
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <div class="flex justify-center gap-2">
+                      <button
+                        (click)="editarArticulo(art)"
+                        class="bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        (click)="confirmarEliminacionArticulo(art.id_articulo!)"
+                        class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-medium px-3 py-1.5 rounded-lg transition"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="articulos.length === 0">
+                  <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                    <p class="text-4xl mb-2">📦</p>
+                    <p class="font-medium">No hay artículos registrados</p>
+                    <p class="text-sm mt-1">Crea tu primer artículo con el formulario</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
         </div>
       </div>
 
-      <div>
-        <label class="block font-medium text-gray-700 mb-1">Precio:</label>
-        <input
-          formControlName="precio"
-          type="number"
-          class="w-full border border-gray-300 rounded-md px-4 py-2"
-           [class.border-red-500]="articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched"
-        />
-        <div *ngIf="articuloForm.get('precio')?.invalid && articuloForm.get('precio')?.touched" class="text-red-600 text-sm mt-1">
-          El precio debe ser un número mayor a 0.
-        </div>
-      </div>
-
-      <div>
-        <label class="block font-medium text-gray-700 mb-1">Existencia:</label>
-        <input
-          formControlName="existencia"
-          type="number"
-          class="w-full border border-gray-300 rounded-md px-4 py-2"
-        />
-      </div>
-
-      <div class="flex gap-3 mt-4">
-        <button
-          type="submit"
-          class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-md"
-        >
-          {{ modoEditar ? 'Actualizar' : 'Crear' }}
-        </button>
-
-        <button
-          type="button"
-          *ngIf="modoEditar"
-          (click)="cancelarEditar()"
-          class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded-md"
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
     </div>
-
-    <!-- TABLA -->
-
-    <div *ngIf="pestaniaActiva === 'tabla'">
-    <table class="w-full bg-white border border-gray-300 rounded-md text-sm">
-      <thead class="bg-gray-200 text-gray-700">
-        <tr>
-          <th class="py-2 px-4 text-left">ID</th>
-          <th class="py-2 px-4 text-left">Nombre</th>
-          <th class="py-2 px-4 text-left">Descripción</th>
-          <th class="py-2 px-4 text-left">Precio</th>
-          <th class="py-2 px-4 text-left">Existencia</th>
-          <th class="py-2 px-4 text-left">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let art of articulos" class="border-t hover:bg-gray-50">
-          <td class="py-2 px-4">{{ art.id_articulo }}</td>
-          <td class="py-2 px-4">{{ art.nombre }}</td>
-          <td class="py-2 px-4">{{ art.descripcion }}</td>
-          <td class="py-2 px-4">{{ art.precio }}</td>
-          <td class="py-2 px-4">{{ art.existencia }}</td>
-          <td class="py-2 px-4">
-            <button
-              class="text-blue-600 hover:underline mr-2"
-              (click)="editarArticulo(art); pestaniaActiva ='formulario';"
-            >
-               🖋️ Editar
-            </button>
-            <button
-              class="text-red-600 hover:underline"
-              (click)="confirmarEliminacionArticulo(art.id_articulo!)"
-            >
-              🗑️ Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </div>
-</div>
 
-<div *ngIf="articuloAEliminar !== null" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-md text-center">
-    <p class="text-lg font-semibold mb-4">¿Estás seguro que deseas eliminar este articulo?</p>
-    <div class="flex justify-center gap-4">
-      <button (click)="eliminarArticuloConfirmado()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded">Sí, eliminar</button>
-      <button (click)="cancelarEliminacionArticulo()" class="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded">Cancelar</button>
+<!-- Modal eliminación -->
+<div *ngIf="articuloAEliminar !== null" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
+    <div class="text-5xl mb-4">🗑️</div>
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">¿Eliminar artículo?</h3>
+    <p class="text-gray-500 text-sm mb-6">Esta acción no se puede deshacer.</p>
+    <div class="flex gap-3">
+      <button (click)="cancelarEliminacionArticulo()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-xl transition">
+        Cancelar
+      </button>
+      <button (click)="eliminarArticuloConfirmado()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 rounded-xl transition">
+        Sí, eliminar
+      </button>
     </div>
   </div>
 </div>

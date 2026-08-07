@@ -8,6 +8,13 @@ export interface Articulo {
   descripcion: string;
   precio: number;
   existencia: number;
+  id_categoria?: number;
+  categoria?: string;
+}
+
+export interface Categoria {
+  id_categoria: number;
+  nombre: string;
 }
 
 @Injectable({
@@ -36,5 +43,9 @@ export class ArticulosService {
 
   eliminarArticulo(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  getCategorias(): Observable<Categoria[]> {
+    return this.http.get<Categoria[]>('http://localhost:3000/api/categorias');
   }
 }
