@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiService } from '../core/services/api.services';
+import { ApiResponse } from '../core/models/api-response.model';
 
 export interface Articulo {
   id_articulo?: number;
@@ -14,27 +15,25 @@ export interface Articulo {
   providedIn: 'root'
 })
 export class ArticulosService {
-  private apiUrl = 'http://localhost:3000/api/articulos';
+  constructor(private api: ApiService) {}
 
-  constructor(private http: HttpClient) {}
-
-  getArticulos(): Observable<Articulo[]> {
-    return this.http.get<Articulo[]>(this.apiUrl);
+  getArticulos(): Observable<ApiResponse<Articulo[]>> {
+    return this.api.get<Articulo[]>('articulos');
   }
 
-  getArticulo(id: number): Observable<Articulo> {
-    return this.http.get<Articulo>(`${this.apiUrl}/${id}`);
+  getArticulo(id: number): Observable<ApiResponse<Articulo>> {
+    return this.api.get<Articulo>(`articulos/${id}`);
   }
 
-  crearArticulo(articulo: Articulo): Observable<any> {
-    return this.http.post(this.apiUrl, articulo);
+  crearArticulo(articulo: Articulo): Observable<ApiResponse<any>> {
+    return this.api.post<any>('articulos', articulo);
   }
 
-  actualizarArticulo(id: number, articulo: Articulo): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, articulo);
+  actualizarArticulo(id: number, articulo: Articulo): Observable<ApiResponse<any>> {
+    return this.api.put<any>(`articulos/${id}`, articulo);
   }
 
-  eliminarArticulo(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  eliminarArticulo(id: number): Observable<ApiResponse<any>> {
+    return this.api.delete<any>(`articulos/${id}`);
   }
 }
