@@ -7,7 +7,8 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule,ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -25,28 +26,35 @@ export class LoginComponent {
       contrasena: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
+
   login() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-   this.authService.login(this.loginForm.value)
-    .subscribe({
-      next: (resp) => {
-        if (resp && resp.token) {
-          this.authService.iniciarSesion(resp.token);
-          this.toastr.success('Inicio de sesion exitoso', 'Éxito');
-          this.loginForm.reset();
-          this.router.navigate(['/dashboard']);
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response) => {
+        // Validamos la estructura global (success y que exista data o token)
+        if (response && response.success) {
+          // Extraemos el token ya sea que venga dentro de response.data o directamente en response.data.token
+          const token = response.data?.token || response.data;
+
+          if (token) {
+            this.authService.iniciarSesion(token);
+            this.toastr.success(response.message || 'Inicio de sesión exitoso', 'Éxito');
+            this.loginForm.reset();
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.toastr.error('No se encontró el token de acceso', 'Error');
+          }
         } else {
-          this.toastr.error('Credenciales invalidas', 'Error');
+          this.toastr.error(response.message || 'Credenciales inválidas', 'Error');
         }
       },
-      error: err => {
-        this.toastr.error(err.error?.mensaje || 'Error al iniciar sesion', 'Error');
+      error: (err) => {
+        this.toastr.error(err.error?.message || 'Error al iniciar sesión', 'Error');
       }
     });
-
-}
+  }
 }

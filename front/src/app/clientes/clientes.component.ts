@@ -1,7 +1,7 @@
-import { Component,OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ClientesService,Cliente } from '../servicios/clientes.service';
+import { ClientesService, Cliente } from '../servicios/clientes.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -22,7 +22,7 @@ export class ClientesComponent implements OnInit {
   };
 
   clienteEditando: Partial<Cliente> | null = null;
-  errores: any= {};
+  errores: any = {};
   clienteAEliminar: number | null = null;
 
   constructor(private clienteService: ClientesService, private toastr: ToastrService) {}
@@ -32,69 +32,78 @@ export class ClientesComponent implements OnInit {
   }
 
   cargarClientes(): void {
-    this.clienteService.getClientes().subscribe((data) => {
-      this.clientes = data;
+    this.clienteService.getClientes().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.clientes = response.data; // <--- AQUÍ LEES LOS DATOS GLOBALES
+        }
+      },
+      error: (err) => {
+        this.toastr.error(err.error?.message || 'Error al cargar los clientes', 'Error');
+      }
     });
   }
 
   agregarCliente(): void {
-    if ( !this.nuevoCliente.nombre || this.nuevoCliente.nombre.trim().length < 3){
+    if (!this.nuevoCliente.nombre || this.nuevoCliente.nombre.trim().length < 3) {
       this.toastr.warning('El nombre debe tener al menos 3 caracteres', 'Advertencia');
       return;
     } 
-     if (!this.nuevoCliente.email || this.nuevoCliente.email.trim().length <= 0) {
+    if (!this.nuevoCliente.email || this.nuevoCliente.email.trim().length <= 0) {
       this.toastr.warning('El email es obligatorio', 'Advertencia');
       return;
-     } 
-      if (!this.nuevoCliente.direccion || this.nuevoCliente.direccion.trim().length <= 0) {
+    } 
+    if (!this.nuevoCliente.direccion || this.nuevoCliente.direccion.trim().length <= 0) {
       this.toastr.warning('La dirección es obligatoria', 'Advertencia');
       return;
-      } 
-      if (!this.nuevoCliente.telefono || isNaN(Number(this.nuevoCliente.telefono)) || this.nuevoCliente.telefono.trim().length < 7
-    ) {
+    } 
+    if (!this.nuevoCliente.telefono || isNaN(Number(this.nuevoCliente.telefono)) || this.nuevoCliente.telefono.trim().length < 7) {
       this.toastr.warning('El telefono debe ser un numero valido y tener al menos 7 caracteres', 'Advertencia');
       return;
     }
 
-    this.clienteService.crearCliente(this.nuevoCliente).subscribe(() => {
-      this.toastr.success('Cliente agregado exitosamente', 'Éxito');
-      this.nuevoCliente = {
-        nombre: '',
-        direccion: '',
-        telefono: '',
-        email: '',
-      };
-      this.cargarClientes();
-    });
-  }
-
-   
-  confirmarEliminacion(id: number): void {
-  this.clienteAEliminar = id;
-    }
-
-  cancelarEliminacion(): void {
-  this.clienteAEliminar = null;
-  }
-
-
-
- eliminarClienteConfirmado(): void {
-  if (this.clienteAEliminar !== null) {
-    this.clienteService.eliminarCliente(this.clienteAEliminar).subscribe({
-      next: () => {
-        this.toastr.success('Cliente eliminado exitosamente', 'Éxito');
+    this.clienteService.crearCliente(this.nuevoCliente).subscribe({
+      next: (response) => {
+        this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
+        this.nuevoCliente = {
+          nombre: '',
+          direccion: '',
+          telefono: '',
+          email: '',
+        };
         this.cargarClientes();
-        this.clienteAEliminar = null;
       },
       error: (err) => {
-        const mensaje = err.error?.error || 'No se pudo eliminar el cliente.';
-        this.toastr.error(mensaje, 'Error');
-        this.clienteAEliminar = null;
+        this.toastr.error(err.error?.message || 'Error al crear el cliente', 'Error');
       }
     });
   }
-}
+
+  confirmarEliminacion(id: number): void {
+    this.clienteAEliminar = id;
+  }
+
+  cancelarEliminacion(): void {
+    this.clienteAEliminar = null;
+  }
+
+  eliminarClienteConfirmado(): void {
+    if (this.clienteAEliminar !== null) {
+      this.clienteService.eliminarCliente(this.clienteAEliminar).subscribe({
+        next: (response) => {
+          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
+          this.cargarClientes();
+          this.clienteAEliminar = null;
+        },
+        error: (err) => {
+          const mensaje = err.error?.message || 'No se pudo eliminar el cliente.';
+          this.toastr.error(mensaje, 'Error');
+          this.clienteAEliminar = null;
+        }
+      });
+    }
+  }
+
   activarEdicion(cliente: Cliente): void {
     this.clienteEditando = { ...cliente };
     this.errores = {}; 
@@ -107,10 +116,15 @@ export class ClientesComponent implements OnInit {
 
     this.clienteService
       .actualizarCliente(this.clienteEditando.id_cliente!, this.clienteEditando)
-      .subscribe(() => {
-        this.toastr.success('Cliente actualizado exitosamente', 'Éxito');
-        this.cancelarEdicion();
-        this.cargarClientes();
+      .subscribe({
+        next: (response) => {
+          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
+          this.cancelarEdicion();
+          this.cargarClientes();
+        },
+        error: (err) => {
+          this.toastr.error(err.error?.message || 'Error al actualizar el cliente', 'Error');
+        }
       });
   }
 
@@ -142,8 +156,4 @@ export class ClientesComponent implements OnInit {
 
     return Object.keys(this.errores).length === 0;
   }
-
-  
-
-
 }

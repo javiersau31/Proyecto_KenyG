@@ -41,13 +41,14 @@ export class RegistroComponent {
 
     this.authService.registrarCliente(this.formulario.value)
       .subscribe({
-        next: ({ mensaje }) => {
-          this.toastr.success(mensaje, 'Éxito');
+        next: (response) => {
+          // Usamos el mensaje dinámico que manda la API global en response.message
+          this.toastr.success(response.message || 'Registro exitoso', 'Éxito');
           this.formulario.reset();
           this.router.navigate(['/login']);
         },
         error: err => {
-          this.toastr.error(err.error?.mensaje || 'Error al registrar el cliente', 'Error');
+          this.toastr.error(err.error?.message || 'Error al registrar el cliente', 'Error');
         }
       });
   }

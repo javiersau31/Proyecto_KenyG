@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ArticulosService, Articulo } from '../servicios/articulos.service';
-import { FormBuilder, FormGroup,Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-
 
 @Component({
   selector: 'app-articulos',
@@ -19,6 +18,7 @@ export class ArticulosComponent implements OnInit {
   modoEditar: boolean = false;
   idEditando: number | null = null;
   articuloAEliminar: number | null = null;
+  pestaniaActiva: 'formulario' | 'tabla' = 'formulario'; 
 
   constructor(private servicio: ArticulosService, private fb: FormBuilder, private toastr: ToastrService) {
     this.articuloForm = this.fb.group({
@@ -34,31 +34,50 @@ export class ArticulosComponent implements OnInit {
   }
 
   obtenerArticulos() {
-    this.servicio.getArticulos().subscribe(data => {
-      this.articulos = data;
+    this.servicio.getArticulos().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.articulos = response.data; // <--- AQUÍ LEES LOS DATOS GLOBALES
+        }
+      },
+      error: (err) => {
+        this.toastr.error(err.error?.message || 'Error al cargar los artículos', 'Error');
+      }
     });
   }
-  pestaniaActiva: 'formulario' | 'tabla' = 'formulario'; 
 
   guardarArticulo() {
-  if (this.articuloForm.invalid) {
-    this.articuloForm.markAllAsTouched(); 
-    return;
-  }
+    if (this.articuloForm.invalid) {
+      this.articuloForm.markAllAsTouched(); 
+      return;
+    }
 
-  const articulo = this.articuloForm.value;
-  if (this.modoEditar && this.idEditando !== null) {
-    this.servicio.actualizarArticulo(this.idEditando, articulo).subscribe(() => {
-      this.obtenerArticulos();
-      this.cancelarEditar();
-    });
-  } else {
-    this.servicio.crearArticulo(articulo).subscribe(() => {
-      this.obtenerArticulos();
-      this.articuloForm.reset();
-    });
+    const articulo = this.articuloForm.value;
+
+    if (this.modoEditar && this.idEditando !== null) {
+      this.servicio.actualizarArticulo(this.idEditando, articulo).subscribe({
+        next: (response) => {
+          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
+          this.obtenerArticulos();
+          this.cancelarEditar();
+        },
+        error: (err) => {
+          this.toastr.error(err.error?.message || 'Error al actualizar', 'Error');
+        }
+      });
+    } else {
+      this.servicio.crearArticulo(articulo).subscribe({
+        next: (response) => {
+          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
+          this.obtenerArticulos();
+          this.articuloForm.reset();
+        },
+        error: (err) => {
+          this.toastr.error(err.error?.message || 'Error al crear', 'Error');
+        }
+      });
+    }
   }
-}
 
   editarArticulo(articulo: Articulo) {
     this.modoEditar = true;
@@ -73,28 +92,26 @@ export class ArticulosComponent implements OnInit {
   }
 
   confirmarEliminacionArticulo(id: number): void {
-  this.articuloAEliminar = id;
-}
-
-cancelarEliminacionArticulo(): void {
-  this.articuloAEliminar = null;
-}
-
-eliminarArticuloConfirmado(): void {
-  if (this.articuloAEliminar !== null) {
-    this.servicio.eliminarArticulo(this.articuloAEliminar).subscribe({
-      next: () => {
-        this.obtenerArticulos();
-        this.articuloAEliminar = null;
-        this.toastr.success('Artículo eliminado con exito', 'Éxito');
-      },
-      error: (err) => {
-        this.toastr.error(err.error?.mensaje || 'Error al eliminar el articulo', 'Error');
-        this.articuloAEliminar = null;
-      }
-    });
+    this.articuloAEliminar = id;
   }
-}
 
-  
+  cancelarEliminacionArticulo(): void {
+    this.articuloAEliminar = null;
+  }
+
+  eliminarArticuloConfirmado(): void {
+    if (this.articuloAEliminar !== null) {
+      this.servicio.eliminarArticulo(this.articuloAEliminar).subscribe({
+        next: (response) => {
+          this.obtenerArticulos();
+          this.articuloAEliminar = null;
+          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
+        },
+        error: (err) => {
+          this.toastr.error(err.error?.message || 'Error al eliminar el articulo', 'Error');
+          this.articuloAEliminar = null;
+        }
+      });
+    }
+  }
 }

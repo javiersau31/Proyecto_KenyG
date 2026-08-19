@@ -2,9 +2,6 @@ import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef, View
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-
-
-
 @Component({
   selector: 'app-autocomplete',
   standalone: true,
@@ -20,19 +17,19 @@ export class AutocompleteComponent {
   @Input() value: any = null;
 
   @Output() cleared = new EventEmitter<void>();
-
   @Output() selected = new EventEmitter<any>();
+  
   @ContentChild(TemplateRef) itemTemplate!: TemplateRef<any>;
-
 
   @ViewChild('defaultTemplate', { static: true })
     defaultTemplate!: TemplateRef<any>;
+
   @HostListener('document:click', ['$event'])
     onClickOutside(event: any) {
     if (!event.target.closest('.autocomplete-container')) {
         this.mostrar = false;
     }
-    }
+  }
 
   termino = '';
   resultados: any[] = [];
@@ -68,10 +65,10 @@ export class AutocompleteComponent {
         this.resultados = this.items;
       }
     }
+
   reset() {
     this.termino = '';
     this.resultados = [];
     this.mostrar = false;
-    }
-
+  }
 }
