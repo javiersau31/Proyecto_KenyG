@@ -37,6 +37,10 @@ export class VentasComponent implements OnInit {
   textoArticulo = '';
   articulosFiltrados: Articulo[] = [];
   mostrarArticulos = false;
+  // AUTOCOMPLETE CLIENTES
+  textoCliente = '';
+  clientesFiltrados: Cliente[] = [];
+  mostrarClientes = false;
 
   ventaSeleccionada: number | null = null;
   detallesVenta: DetalleVenta[] = [];
@@ -94,22 +98,48 @@ export class VentasComponent implements OnInit {
   }
 
   cargarClientes(): void {
-
     this.clientesService.obtenerClientes().subscribe({
       next: (clientes) => {
         this.clientes = clientes;
+        this.clientesFiltrados = clientes;
       },
-
       error: (err) => {
         console.error(err);
+
         this.toastr.error(
           err.error?.mensaje || 'Error al cargar los clientes',
           'Error'
         );
       }
     });
-
   }
+  seleccionarCliente(cliente: Cliente): void {
+    if (cliente.id_cliente == null) {
+      return;
+    }
+
+    this.idClienteSeleccionado = cliente.id_cliente;
+    this.textoCliente = cliente.nombre;
+    this.mostrarClientes = false;
+  }
+
+  buscarClientes(): void {
+  const texto = this.textoCliente.trim().toLowerCase();
+
+  if (!texto) {
+    this.clientesFiltrados = this.clientes.slice(0, 10);
+    this.mostrarClientes = true;
+    return;
+  }
+
+  this.clientesFiltrados = this.clientes
+    .filter(cliente =>
+      cliente.nombre?.toLowerCase().includes(texto)
+    )
+    .slice(0, 10);
+
+  this.mostrarClientes = true;
+}
 
   cargarArticulos(): void {
 
@@ -480,13 +510,6 @@ export class VentasComponent implements OnInit {
 
   }
 
- seleccionarCliente(cliente: Cliente): void {
-  if (cliente.id_cliente == null) {
-    return;
-  }
-
-  this.idClienteSeleccionado = cliente.id_cliente;
-}
 
 
 buscarArticulos(): void {

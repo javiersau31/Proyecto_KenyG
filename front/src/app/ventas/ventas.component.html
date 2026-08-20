@@ -1,80 +1,48 @@
 <div class="min-h-screen bg-gray-100 p-4 md:p-6">
 
   <!-- CONTENEDOR PRINCIPAL -->
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-6xl mx-auto">
 
     <!-- HEADER -->
-    <div
-      class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-6"
-    >
-      <div
-        class="bg-gradient-to-r from-blue-950 via-blue-900 to-blue-800 px-6 py-7"
-      >
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between gap-5"
-        >
+    <div class="relative overflow-visible bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900
+                border border-blue-900/50 rounded-2xl shadow-2xl mb-6">
 
-          <div>
-            <p
-              class="text-blue-200 text-xs font-semibold uppercase tracking-[0.25em] mb-1"
-            >
-              Gestión comercial
-            </p>
+      <div class="absolute inset-0 opacity-20 pointer-events-none
+                  bg-[radial-gradient(circle_at_20%_20%,#3b82f6,transparent_35%)]">
+      </div>
 
-            <h2 class="text-3xl font-bold text-white tracking-tight">
-              Ventas
-            </h2>
+      <div class="relative p-6 md:p-8 flex flex-col md:flex-row
+                  md:items-center md:justify-between gap-4">
 
-            <p class="text-blue-100 text-sm mt-2">
-              Administra ventas, artículos y movimientos de inventario.
-            </p>
-          </div>
-
+        <div>
           <div class="flex items-center gap-3">
-
-            <!-- CONTADOR -->
-            <div
-              class="hidden sm:flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-3 backdrop-blur-sm"
-            >
-              <div
-                class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center"
-              >
-                <span class="text-white text-lg font-bold">
-                  #
-                </span>
-              </div>
-
-              <div>
-                <p class="text-blue-200 text-xs">
-                  Ventas registradas
-                </p>
-
-                <p class="text-white text-xl font-bold">
-                  {{ ventas.length }}
-                </p>
-              </div>
+            <div class="w-11 h-11 rounded-xl bg-blue-600/20 border border-blue-500/40
+                        flex items-center justify-center">
+              <span class="text-blue-400 text-xl font-bold">$</span>
             </div>
 
-            <!-- NUEVA VENTA -->
-            <button
-              type="button"
-              (click)="mostrarFormulario = !mostrarFormulario"
-              class="group flex items-center justify-center gap-2 bg-white text-blue-900 font-semibold px-5 py-3 rounded-xl shadow-md hover:bg-blue-50 hover:shadow-lg transition-all duration-200"
-            >
-              <span
-                class="text-xl leading-none group-hover:rotate-90 transition-transform duration-200"
-              >
-                +
-              </span>
+            <div>
+              <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                Ventas
+              </h1>
 
-              <span>
-                Nueva venta
-              </span>
-            </button>
-
+              <p class="text-slate-400 text-sm mt-1">
+                Gestión de ventas y detalles
+              </p>
+            </div>
           </div>
-
         </div>
+
+        <button
+          type="button"
+          (click)="mostrarFormulario = !mostrarFormulario"
+          class="bg-blue-600 hover:bg-blue-500 text-white font-semibold
+                 px-5 py-2.5 rounded-xl shadow-lg shadow-blue-900/30
+                 transition-all duration-200">
+
+          + Nueva Venta
+        </button>
+
       </div>
     </div>
 
@@ -82,152 +50,152 @@
     <!-- FORMULARIO NUEVA VENTA -->
     <div
       *ngIf="mostrarFormulario"
-      class="bg-white rounded-2xl shadow-lg border border-gray-200 mb-6 overflow-hidden"
-    >
+      class="bg-slate-900 border border-slate-700 rounded-2xl
+             shadow-xl mb-6 overflow-visible">
 
-      <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div class="px-6 py-4 border-b border-slate-700">
+        <h2 class="text-white font-semibold">
+          Nueva venta
+        </h2>
 
-        <div class="flex items-center gap-3">
-
-          <div
-            class="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold"
-          >
-            +
-          </div>
-
-          <div>
-            <h3 class="font-bold text-gray-900">
-              Registrar nueva venta
-            </h3>
-
-            <p class="text-xs text-gray-500">
-              Selecciona el cliente para comenzar.
-            </p>
-          </div>
-
-        </div>
-
+        <p class="text-slate-400 text-xs mt-1">
+          Selecciona el cliente para crear la venta
+        </p>
       </div>
-
 
       <div class="p-6">
 
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
+        <div class="max-w-xl">
 
-          <div>
+          <label class="block text-sm font-medium text-slate-300 mb-2">
+            Cliente
+          </label>
 
-            <label
-              for="cliente"
-              class="block text-sm font-semibold text-gray-700 mb-2"
-            >
-              Cliente
-            </label>
+          <!-- AUTOCOMPLETE CLIENTE -->
+          <div class="relative z-50">
 
-            <div class="mb-4">
+            <input
+              type="text"
+              [(ngModel)]="textoCliente"
+              (input)="buscarClientes()"
+              (focus)="mostrarClientes = true"
+              placeholder="Buscar cliente..."
+              autocomplete="off"
+              class="w-full bg-slate-800 border border-slate-600
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
+                     text-white placeholder-slate-500 rounded-xl
+                     px-4 py-3 outline-none transition"
+            />
 
-              <label class="block font-medium text-gray-700 mb-2">
-                Cliente
-              </label>
+            <!-- RESULTADOS CLIENTES -->
+            <div
+              *ngIf="mostrarClientes && clientesFiltrados.length > 0"
+              class="absolute left-0 right-0 top-full mt-2
+                     bg-slate-800 border border-slate-600
+                     rounded-xl shadow-2xl overflow-hidden z-[9999]">
 
-              <app-autocomplete
-                [items]="clientes"
-                displayField="nombre"
-                placeholder="🔍 Buscar cliente..."
-                (seleccionado)="seleccionarCliente($event)"
-              ></app-autocomplete>
+              <button
+                type="button"
+                *ngFor="let cliente of clientesFiltrados"
+                (click)="seleccionarCliente(cliente)"
+                class="w-full text-left px-4 py-3
+                       hover:bg-blue-600/20 border-b border-slate-700
+                       last:border-b-0 transition">
+
+                <div class="text-white text-sm font-medium">
+                  {{ cliente.nombre }}
+                </div>
+
+              </button>
 
             </div>
 
+            <!-- SIN RESULTADOS -->
+            <div
+              *ngIf="mostrarClientes &&
+                     textoCliente &&
+                     clientesFiltrados.length === 0"
+              class="absolute left-0 right-0 top-full mt-2
+                     bg-slate-800 border border-slate-600
+                     rounded-xl shadow-2xl z-[9999]">
+
+              <div class="px-4 py-3 text-sm text-slate-400">
+                No se encontraron clientes.
+              </div>
+
+            </div>
 
           </div>
 
+          <button
+            type="button"
+            (click)="crearVenta()"
+            class="mt-4 bg-blue-600 hover:bg-blue-500
+                   text-white font-semibold px-5 py-2.5 rounded-xl
+                   transition shadow-lg shadow-blue-900/30">
 
-          <div class="flex gap-2">
-
-            <button
-              type="button"
-              (click)="crearVenta()"
-              class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all"
-            >
-              Crear venta
-            </button>
-
-            <button
-              type="button"
-              (click)="mostrarFormulario = false"
-              class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-3 rounded-xl transition"
-            >
-              Cancelar
-            </button>
-
-          </div>
+            Crear venta
+          </button>
 
         </div>
 
       </div>
-
     </div>
 
 
-    <!-- LISTADO DE VENTAS -->
-    <div
-      class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
-    >
+    <!-- TABLA DE VENTAS -->
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl
+                shadow-2xl overflow-visible">
 
       <!-- HEADER TABLA -->
-      <div
-        class="px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-      >
+      <div class="px-6 py-5 border-b border-slate-700">
 
-        <div>
+        <div class="flex items-center justify-between">
 
-          <h3 class="text-lg font-bold text-gray-900">
-            Historial de ventas
-          </h3>
+          <div>
+            <h2 class="text-lg font-semibold text-white">
+              Historial de ventas
+            </h2>
 
-          <p class="text-sm text-gray-500 mt-1">
-            Consulta y administra las operaciones realizadas.
-          </p>
+            <p class="text-xs text-slate-400 mt-1">
+              Consulta y administra las ventas registradas
+            </p>
+          </div>
 
-        </div>
+          <div class="text-xs text-slate-500">
+            {{ ventas.length }} ventas
+          </div>
 
-        <div
-          class="inline-flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 text-xs font-semibold text-gray-600"
-        >
-          <span
-            class="w-2 h-2 rounded-full bg-green-500"
-          ></span>
-
-          Sistema operativo
         </div>
 
       </div>
 
 
-      <!-- TABLA -->
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto overflow-y-visible">
 
         <table class="min-w-full">
 
-          <thead>
+          <thead class="bg-slate-800/80">
 
-            <tr
-              class="bg-gray-50 border-b border-gray-200 text-xs uppercase tracking-wider text-gray-500"
-            >
+            <tr>
 
-              <th class="py-4 px-6 text-left font-bold">
+              <th class="px-6 py-4 text-left text-xs font-semibold
+                         text-slate-400 uppercase tracking-wider">
                 Fecha
               </th>
 
-              <th class="py-4 px-6 text-left font-bold">
+              <th class="px-6 py-4 text-left text-xs font-semibold
+                         text-slate-400 uppercase tracking-wider">
                 Cliente
               </th>
 
-              <th class="py-4 px-6 text-left font-bold">
+              <th class="px-6 py-4 text-left text-xs font-semibold
+                         text-slate-400 uppercase tracking-wider">
                 Total
               </th>
 
-              <th class="py-4 px-6 text-right font-bold">
+              <th class="px-6 py-4 text-left text-xs font-semibold
+                         text-slate-400 uppercase tracking-wider">
                 Acciones
               </th>
 
@@ -236,101 +204,61 @@
           </thead>
 
 
-          <tbody>
+          <tbody class="divide-y divide-slate-800">
 
-            <!-- VENTA -->
-            <ng-container
-              *ngFor="let venta of ventas"
-            >
+            <ng-container *ngFor="let venta of ventas">
 
-              <tr
-                class="border-b border-gray-100 hover:bg-blue-50/40 transition-colors"
-                [class.bg-blue-50]="ventaSeleccionada === venta.id_venta"
-              >
+              <!-- VENTA -->
+              <tr class="hover:bg-slate-800/50 transition">
 
-                <!-- FECHA -->
-                <td class="py-4 px-6">
+                <td class="px-6 py-4 text-sm text-slate-300">
+                  {{ venta.fecha }}
+                </td>
 
-                  <div class="flex items-center gap-3">
+                <td class="px-6 py-4">
 
-                    <div
-                      class="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center"
-                    >
-                      <span class="font-bold">
-                        $
-                      </span>
-                    </div>
-
-                    <div>
-
-                      <p class="font-semibold text-gray-800">
-                        Venta #{{ venta.id_venta }}
-                      </p>
-
-                      <p class="text-xs text-gray-500">
-                        {{ venta.fecha }}
-                      </p>
-
-                    </div>
-
+                  <div class="text-sm font-medium text-white">
+                    {{ venta.nombre_cliente }}
                   </div>
 
                 </td>
 
+                <td class="px-6 py-4">
 
-                <!-- CLIENTE -->
-                <td class="py-4 px-6">
-
-                  <p class="font-medium text-gray-800">
-                    {{ venta.nombre_cliente }}
-                  </p>
-
-                  <p class="text-xs text-gray-400">
-                    Cliente registrado
-                  </p>
-
-                </td>
-
-
-                <!-- TOTAL -->
-                <td class="py-4 px-6">
-
-                  <span
-                    class="text-lg font-bold text-blue-900"
-                  >
+                  <span class="text-sm font-semibold text-emerald-400">
                     $ {{ venta.total | number:'1.2-2' }}
                   </span>
 
                 </td>
 
+                <td class="px-6 py-4">
 
-                <!-- ACCIONES -->
-                <td class="py-4 px-6">
-
-                  <div
-                    class="flex justify-end items-center gap-2"
-                  >
+                  <div class="flex flex-wrap gap-2">
 
                     <button
                       type="button"
                       (click)="abrirModalDetalle(venta.id_venta)"
-                      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-100 text-blue-800 hover:bg-blue-200 font-semibold text-sm transition"
-                    >
+                      class="bg-blue-600/20 hover:bg-blue-600
+                             border border-blue-500/30 hover:border-blue-500
+                             text-blue-400 hover:text-white
+                             px-3 py-1.5 rounded-lg text-xs font-medium
+                             transition">
 
-                      <span>
-                        {{ ventaSeleccionada === venta.id_venta
-                          ? 'Cerrar'
-                          : 'Detalles' }}
-                      </span>
+                      {{ ventaSeleccionada === venta.id_venta
+                        ? 'Ocultar'
+                        : 'Detalles' }}
 
                     </button>
-
 
                     <button
                       type="button"
                       (click)="confirmarEliminacionVenta(venta.id_venta)"
-                      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-semibold text-sm transition"
-                    >
+                      class="bg-red-600/10 hover:bg-red-600
+                             border border-red-500/20 hover:border-red-500
+                             text-red-400 hover:text-white
+                             px-3 py-1.5 rounded-lg text-xs font-medium
+                             transition">
+
                       Eliminar
                     </button>
 
@@ -344,55 +272,27 @@
               <!-- DETALLES -->
               <tr
                 *ngIf="ventaSeleccionada === venta.id_venta"
-                class="bg-gray-50"
-              >
+                class="bg-slate-950/70">
 
-                <td
-                  colspan="4"
-                  class="px-4 md:px-6 py-5"
-                >
+                <td colspan="4" class="px-4 md:px-6 py-5">
 
-                  <div
-                    class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden"
-                  >
+                  <div class="border border-slate-700 rounded-xl
+                              overflow-vissible">
 
-                    <!-- HEADER DETALLES -->
-                    <div
-                      class="px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50"
-                    >
+                    <!-- CABECERA DETALLES -->
+                    <div class="bg-slate-800 px-5 py-4
+                                border-b border-slate-700">
 
-                      <div
-                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-                      >
+                      <div class="flex items-center justify-between">
 
                         <div>
+                          <h3 class="text-sm font-semibold text-white">
+                            Detalles de la venta
+                          </h3>
 
-                          <p
-                            class="text-xs uppercase tracking-wider text-blue-700 font-bold"
-                          >
-                            Detalle de operación
-                          </p>
-
-                          <h4
-                            class="text-lg font-bold text-gray-900 mt-1"
-                          >
+                          <p class="text-xs text-slate-500 mt-1">
                             Venta #{{ venta.id_venta }}
-                          </h4>
-
-                        </div>
-
-                        <div
-                          class="bg-blue-900 text-white px-4 py-2 rounded-xl"
-                        >
-
-                          <span class="text-xs text-blue-200">
-                            Total
-                          </span>
-
-                          <p class="font-bold">
-                            $ {{ venta.total | number:'1.2-2' }}
                           </p>
-
                         </div>
 
                       </div>
@@ -401,33 +301,36 @@
 
 
                     <!-- TABLA DETALLES -->
-                    <div class="overflow-x-auto">
+                    <div class="relative z-[9999]">
 
                       <table class="min-w-full">
 
-                        <thead>
+                        <thead class="bg-slate-900">
 
-                          <tr
-                            class="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500"
-                          >
+                          <tr>
 
-                            <th class="py-3 px-5 text-left">
+                            <th class="px-5 py-3 text-left text-xs
+                                       text-slate-500 uppercase">
                               Artículo
                             </th>
 
-                            <th class="py-3 px-5 text-center">
+                            <th class="px-5 py-3 text-left text-xs
+                                       text-slate-500 uppercase">
                               Cantidad
                             </th>
 
-                            <th class="py-3 px-5 text-right">
-                              Precio unitario
+                            <th class="px-5 py-3 text-left text-xs
+                                       text-slate-500 uppercase">
+                              Precio
                             </th>
 
-                            <th class="py-3 px-5 text-right">
+                            <th class="px-5 py-3 text-left text-xs
+                                       text-slate-500 uppercase">
                               Subtotal
                             </th>
 
-                            <th class="py-3 px-5 text-right">
+                            <th class="px-5 py-3 text-left text-xs
+                                       text-slate-500 uppercase">
                               Acciones
                             </th>
 
@@ -436,62 +339,39 @@
                         </thead>
 
 
-                        <tbody>
+                        <tbody class="divide-y divide-slate-800">
 
                           <tr
                             *ngFor="let d of detallesVenta"
-                            class="border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition"
-                          >
+                            class="hover:bg-slate-800/30">
 
-                            <!-- ARTÍCULO -->
-                            <td class="py-4 px-5">
+                            <!-- ARTICULO -->
+                            <td class="px-5 py-4">
 
-                              <div class="flex items-center gap-3">
-
-                                <div
-                                  class="w-9 h-9 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center font-bold"
-                                >
-                                  A
-                                </div>
-
-                                <div>
-
-                                  <p
-                                    class="font-semibold text-gray-800"
-                                  >
-                                    {{ d.nombre_articulo }}
-                                  </p>
-
-                                  <p
-                                    class="text-xs text-gray-400"
-                                  >
-                                    ID: {{ d.id_articulo }}
-                                  </p>
-
-                                </div>
-
-                              </div>
+                              <span class="text-sm text-white">
+                                {{ d.nombre_articulo }}
+                              </span>
 
                             </td>
 
 
                             <!-- CANTIDAD -->
-                            <td class="py-4 px-5 text-center">
+                            <td class="px-5 py-4">
 
                               <input
                                 *ngIf="modoEdicion[d.id_detalle]"
                                 [(ngModel)]="d.cantidad"
                                 type="number"
                                 min="1"
-                                step="1"
-                                required
-                                class="w-20 text-center border border-blue-300 rounded-lg px-2 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                class="w-20 bg-slate-800 border
+                                       border-slate-600 rounded-lg
+                                       text-white px-2 py-1.5
+                                       outline-none focus:border-blue-500"
                               />
 
                               <span
                                 *ngIf="!modoEdicion[d.id_detalle]"
-                                class="inline-flex min-w-10 justify-center bg-gray-100 text-gray-700 font-bold px-3 py-2 rounded-lg"
-                              >
+                                class="text-sm text-slate-300">
                                 {{ d.cantidad }}
                               </span>
 
@@ -499,23 +379,20 @@
 
 
                             <!-- PRECIO -->
-                            <td
-                              class="py-4 px-5 text-right font-medium text-gray-700"
-                            >
+                            <td class="px-5 py-4">
 
-                              $ {{ d.precio_unitario | number:'1.2-2' }}
+                              <span class="text-sm text-slate-300">
+                                $ {{ d.precio_unitario | number:'1.2-2' }}
+                              </span>
 
                             </td>
 
 
                             <!-- SUBTOTAL -->
-                            <td
-                              class="py-4 px-5 text-right"
-                            >
+                            <td class="px-5 py-4">
 
-                              <span
-                                class="font-bold text-blue-900"
-                              >
+                              <span class="text-sm font-semibold
+                                           text-emerald-400">
                                 $ {{ d.subtotal | number:'1.2-2' }}
                               </span>
 
@@ -523,18 +400,17 @@
 
 
                             <!-- ACCIONES -->
-                            <td class="py-4 px-5">
+                            <td class="px-5 py-4">
 
-                              <div
-                                class="flex justify-end items-center gap-3"
-                              >
+                              <div class="flex gap-3">
 
                                 <button
                                   *ngIf="!modoEdicion[d.id_detalle]"
                                   type="button"
                                   (click)="activarEdicion(d.id_detalle)"
-                                  class="text-blue-700 hover:text-blue-900 font-semibold text-sm"
-                                >
+                                  class="text-blue-400 hover:text-blue-300
+                                         text-xs font-medium">
+
                                   Editar
                                 </button>
 
@@ -542,16 +418,18 @@
                                   *ngIf="modoEdicion[d.id_detalle]"
                                   type="button"
                                   (click)="guardarEdicion(d)"
-                                  class="text-green-700 hover:text-green-900 font-semibold text-sm"
-                                >
+                                  class="text-emerald-400 hover:text-emerald-300
+                                         text-xs font-medium">
+
                                   Guardar
                                 </button>
 
                                 <button
                                   type="button"
                                   (click)="eliminarDetalle(d.id_detalle)"
-                                  class="text-red-600 hover:text-red-800 font-semibold text-sm"
-                                >
+                                  class="text-red-400 hover:text-red-300
+                                         text-xs font-medium">
+
                                   Eliminar
                                 </button>
 
@@ -563,42 +441,14 @@
 
 
                           <!-- SIN DETALLES -->
-                          <tr
-                            *ngIf="!detallesVenta.length"
-                          >
+                          <tr *ngIf="detallesVenta.length === 0">
 
                             <td
                               colspan="5"
-                              class="py-10 text-center"
-                            >
+                              class="px-5 py-8 text-center
+                                     text-sm text-slate-500">
 
-                              <div
-                                class="flex flex-col items-center"
-                              >
-
-                                <div
-                                  class="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center mb-3"
-                                >
-                                  <span
-                                    class="text-xl text-gray-400"
-                                  >
-                                    ∅
-                                  </span>
-                                </div>
-
-                                <p
-                                  class="font-semibold text-gray-700"
-                                >
-                                  Esta venta no tiene artículos
-                                </p>
-
-                                <p
-                                  class="text-sm text-gray-400 mt-1"
-                                >
-                                  Agrega un artículo utilizando el formulario inferior.
-                                </p>
-
-                              </div>
+                              Esta venta todavía no tiene detalles.
 
                             </td>
 
@@ -613,103 +463,114 @@
 
                     <!-- AGREGAR DETALLE -->
                     <div
-                      class="border-t border-gray-200 bg-gray-50 px-5 py-5"
-                    >
+                      class="relative overflow-visible
+                             bg-slate-900 border-t border-slate-700
+                             p-5">
 
-                      <div class="mb-4">
-
-                        <p
-                          class="text-xs uppercase tracking-wider text-blue-700 font-bold"
-                        >
-                          Nuevo artículo
-                        </p>
-
-                        <p class="text-sm text-gray-500 mt-1">
-                          El precio se obtiene automáticamente del catálogo.
-                        </p>
-
-                      </div>
-
+                      <h4 class="text-sm font-semibold text-white mb-4">
+                        Agregar artículo
+                      </h4>
 
                       <div
-                        class="grid grid-cols-1 md:grid-cols-[1fr_180px_auto] gap-3 items-start"
-                      >
+                        class="grid grid-cols-1 md:grid-cols-[1fr_160px_auto]
+                               gap-3 items-start">
 
-                        <!-- ARTÍCULO -->
-                        <div class="relative">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                          Artículo
-                        </label>
-
-                        <input
-                          type="text"
-                          [(ngModel)]="textoArticulo"
-                          (input)="buscarArticulos()"
-                          placeholder="Buscar artículo..."
-                          autocomplete="off"
-                          class="w-full border border-gray-300 rounded-lg px-4 py-3
-                                focus:outline-none focus:ring-2 focus:ring-blue-500
-                                focus:border-blue-500"
-                        />
-
-                        <!-- AUTOCOMPLETE -->
-                        <div
-                          *ngIf="mostrarArticulos && articulosFiltrados.length > 0"
-                          class="absolute left-0 right-0 top-full mt-1
-                                bg-white border border-gray-200 rounded-lg
-                                shadow-xl z-50 max-h-60 overflow-y-auto"
-                        >
-                          <button
-                            *ngFor="let articulo of articulosFiltrados"
-                            type="button"
-                            (click)="seleccionarArticulo(articulo)"
-                            class="w-full text-left px-4 py-3
-                                  hover:bg-blue-50 border-b border-gray-100
-                                  last:border-b-0 transition"
-                          >
-                            <div class="font-medium text-gray-800">
-                              {{ articulo.nombre }}
-                            </div>
-
-                            <div class="text-xs text-gray-500">
-                              ${{ articulo.precio | number:'1.2-2' }}
-                            </div>
-                          </button>
-                        </div>
-                      </div>
-
-
-                        <!-- CANTIDAD -->
-                        <div>
+                        <!-- AUTOCOMPLETE ARTICULO -->
+                        <div class="relative z-50">
 
                           <input
-                            type="number"
-                            [(ngModel)]="detalle.cantidad"
-                            min="1"
-                            step="1"
-                            placeholder="Cantidad"
-                            #cantidad="ngModel"
-                            name="cantidad"
-                            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            type="text"
+                            [(ngModel)]="textoArticulo"
+                            (input)="buscarArticulos()"
+                            (focus)="mostrarArticulos = true"
+                            placeholder="Buscar artículo..."
+                            autocomplete="off"
+                            class="w-full bg-slate-800
+                                   border border-slate-600
+                                   focus:border-blue-500
+                                   focus:ring-2 focus:ring-blue-500/20
+                                   text-white placeholder-slate-500
+                                   rounded-xl px-4 py-3
+                                   outline-none transition"
                           />
 
+                          <!-- RESULTADOS ARTICULOS -->
                           <div
-                            *ngIf="cantidad.invalid && cantidad.touched"
-                            class="text-red-600 text-xs mt-1"
-                          >
-                            Cantidad inválida.
+                            *ngIf="mostrarArticulos &&
+                                   articulosFiltrados.length > 0"
+                            class="absolute left-0 right-0 top-full mt-2
+                                   bg-slate-800 border border-slate-600
+                                   rounded-xl shadow-2xl
+                                   overflow-hidden z-[9999]">
+
+                            <button
+                              type="button"
+                              *ngFor="let articulo of articulosFiltrados"
+                              (click)="seleccionarArticulo(articulo)"
+                              class="w-full text-left px-4 py-3
+                                     hover:bg-blue-600/20
+                                     border-b border-slate-700
+                                     last:border-b-0 transition">
+
+                              <div class="text-sm text-white font-medium">
+                                {{ articulo.nombre }}
+                              </div>
+
+                              <div class="text-xs text-emerald-400 mt-1">
+                                $ {{ articulo.precio | number:'1.2-2' }}
+                              </div>
+
+                            </button>
+
+                          </div>
+
+
+                          <!-- SIN RESULTADOS -->
+                          <div
+                            *ngIf="mostrarArticulos &&
+                                   textoArticulo &&
+                                   articulosFiltrados.length === 0"
+                            class="absolute left-0 right-0 top-full mt-2
+                                   bg-slate-800 border border-slate-600
+                                   rounded-xl shadow-2xl
+                                   z-[9999]">
+
+                            <div class="px-4 py-3 text-sm text-slate-400">
+                              No se encontraron artículos.
+                            </div>
+
                           </div>
 
                         </div>
 
 
-                        <!-- BOTÓN -->
+                        <!-- CANTIDAD -->
+                        <input
+                          type="number"
+                          [(ngModel)]="detalle.cantidad"
+                          min="1"
+                          placeholder="Cantidad"
+                          class="w-full bg-slate-800
+                                 border border-slate-600
+                                 focus:border-blue-500
+                                 focus:ring-2 focus:ring-blue-500/20
+                                 text-white placeholder-slate-500
+                                 rounded-xl px-4 py-3
+                                 outline-none"
+                        />
+
+
+                        <!-- GUARDAR -->
                         <button
                           type="button"
                           (click)="agregarDetalle()"
-                          class="bg-green-700 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all"
-                        >
-                          Agregar artículo
+                          class="bg-emerald-600 hover:bg-emerald-500
+                                 text-white font-semibold
+                                 px-5 py-3 rounded-xl
+                                 transition shadow-lg
+                                 shadow-emerald-900/20">
+
+                          Agregar
                         </button>
 
                       </div>
@@ -724,144 +585,84 @@
 
             </ng-container>
 
-
-            <!-- SIN VENTAS -->
-            <tr *ngIf="!ventas.length">
-
-              <td
-                colspan="4"
-                class="py-16 text-center"
-              >
-
-                <div class="flex flex-col items-center">
-
-                  <div
-                    class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mb-4"
-                  >
-                    <span class="text-2xl font-bold">
-                      $
-                    </span>
-                  </div>
-
-                  <h4
-                    class="text-lg font-bold text-gray-800"
-                  >
-                    No hay ventas registradas
-                  </h4>
-
-                  <p
-                    class="text-sm text-gray-500 mt-1 mb-5"
-                  >
-                    Comienza creando una nueva venta.
-                  </p>
-
-                  <button
-                    type="button"
-                    (click)="mostrarFormulario = true"
-                    class="bg-blue-900 hover:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-xl transition"
-                  >
-                    Crear primera venta
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
           </tbody>
 
         </table>
 
       </div>
 
+
+      <!-- SIN VENTAS -->
+      <div
+        *ngIf="ventas.length === 0"
+        class="py-16 text-center">
+
+        <div class="text-slate-500 text-sm">
+          No hay ventas registradas.
+        </div>
+
+      </div>
+
     </div>
 
   </div>
-
 </div>
 
 
 <!-- MODAL ELIMINAR VENTA -->
 <div
   *ngIf="ventaAEliminar !== null"
-  class="fixed inset-0 flex items-center justify-center bg-gray-950/60 backdrop-blur-sm z-50 p-4"
->
+  class="fixed inset-0 flex items-center justify-center
+         bg-black/70 backdrop-blur-sm z-[10000] p-4">
 
   <div
-    class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-200"
-  >
+    class="bg-slate-900 border border-slate-700
+           rounded-2xl shadow-2xl w-full max-w-md">
 
-    <!-- HEADER -->
-    <div
-      class="bg-gradient-to-r from-red-700 to-red-600 px-6 py-5"
-    >
-
-      <div class="flex items-center gap-3">
-
-        <div
-          class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center text-white font-bold text-xl"
-        >
-          !
-        </div>
-
-        <div>
-
-          <h3 class="text-lg font-bold text-white">
-            Eliminar venta
-          </h3>
-
-          <p class="text-red-100 text-xs mt-1">
-            Esta acción requiere confirmación.
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- BODY -->
     <div class="p-6">
 
-      <p class="text-gray-700 leading-relaxed">
-        ¿Estás seguro de que deseas eliminar esta venta?
-      </p>
+      <div class="w-12 h-12 rounded-xl
+                  bg-red-500/10 border border-red-500/20
+                  flex items-center justify-center mb-4">
 
-      <div
-        class="mt-4 bg-red-50 border border-red-100 rounded-xl p-4"
-      >
-
-        <p class="text-sm text-red-700">
-          Se eliminarán los datos asociados a la venta.
-        </p>
+        <span class="text-red-400 text-xl">
+          !
+        </span>
 
       </div>
 
-    </div>
+      <h3 class="text-lg font-semibold text-white">
+        Eliminar venta
+      </h3>
 
+      <p class="text-sm text-slate-400 mt-2">
+        ¿Estás seguro de que deseas eliminar esta venta?
+        Esta acción no se puede deshacer.
+      </p>
 
-    <!-- FOOTER -->
-    <div
-      class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3"
-    >
+      <div class="flex justify-end gap-3 mt-6">
 
-      <button
-        type="button"
-        (click)="cancelarEliminacionVenta()"
-        class="px-5 py-2.5 rounded-xl bg-white border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition"
-      >
-        Cancelar
-      </button>
+        <button
+          type="button"
+          (click)="cancelarEliminacionVenta()"
+          class="px-4 py-2 rounded-xl
+                 bg-slate-800 hover:bg-slate-700
+                 text-slate-300 transition">
 
-      <button
-        type="button"
-        (click)="eliminarVentaConfirmada()"
-        class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold shadow-md transition"
-      >
-        Sí, eliminar
-      </button>
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          (click)="eliminarVentaConfirmada()"
+          class="px-4 py-2 rounded-xl
+                 bg-red-600 hover:bg-red-500
+                 text-white font-medium transition">
+
+          Sí, eliminar
+        </button>
+
+      </div>
 
     </div>
 

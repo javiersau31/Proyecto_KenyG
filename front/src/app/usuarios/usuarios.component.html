@@ -1,0 +1,691 @@
+<div class="min-h-screen bg-gray-100 p-6">
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="max-w-6xl mx-auto">
+
+    <!-- HEADER -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+        <div>
+          <h2 class="text-2xl font-bold text-blue-900">
+            Usuarios
+          </h2>
+
+          <p class="text-sm text-gray-500 mt-1">
+            Administración de usuarios y permisos del sistema
+          </p>
+        </div>
+
+        <button
+          type="button"
+          (click)="abrirFormularioCrear()"
+          class="inline-flex items-center justify-center gap-2
+                 bg-blue-900 hover:bg-blue-800
+                 text-white font-medium
+                 px-5 py-2.5 rounded-lg
+                 transition shadow-sm"
+        >
+          <span class="text-lg">+</span>
+          Nuevo usuario
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLA -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+
+      <!-- CABECERA DE TABLA -->
+      <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+
+        <div>
+          <h3 class="font-semibold text-gray-800">
+            Usuarios registrados
+          </h3>
+
+          <p class="text-xs text-gray-500 mt-1">
+            {{ usuarios.length }} usuario{{ usuarios.length !== 1 ? 's' : '' }}
+          </p>
+        </div>
+
+      </div>
+
+
+      <!-- TABLA -->
+      <div class="overflow-x-auto">
+
+        <table class="min-w-full">
+
+          <thead class="bg-gray-50 border-b border-gray-200">
+
+            <tr>
+
+              <th
+                class="px-6 py-3 text-left text-xs font-semibold
+                       text-gray-500 uppercase tracking-wider"
+              >
+                Usuario
+              </th>
+
+              <th
+                class="px-6 py-3 text-left text-xs font-semibold
+                       text-gray-500 uppercase tracking-wider"
+              >
+                Contacto
+              </th>
+
+              <th
+                class="px-6 py-3 text-left text-xs font-semibold
+                       text-gray-500 uppercase tracking-wider"
+              >
+                Rol
+              </th>
+
+              <th
+                class="px-6 py-3 text-left text-xs font-semibold
+                       text-gray-500 uppercase tracking-wider"
+              >
+                Registro
+              </th>
+
+              <th
+                class="px-6 py-3 text-center text-xs font-semibold
+                       text-gray-500 uppercase tracking-wider"
+              >
+                Acciones
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody class="divide-y divide-gray-100">
+
+            <tr
+              *ngFor="let u of usuarios"
+              class="hover:bg-gray-50 transition"
+            >
+
+              <!-- USUARIO -->
+              <td class="px-6 py-4">
+
+                <div class="flex items-center gap-3">
+
+                  <div
+                    class="w-10 h-10 rounded-full
+                           bg-blue-100 text-blue-900
+                           flex items-center justify-center
+                           font-bold"
+                  >
+                    {{ u.nombre.charAt(0).toUpperCase() }}
+                  </div>
+
+                  <div>
+
+                    <div class="font-medium text-gray-800">
+                      {{ u.nombre }}
+                    </div>
+
+                    <div class="text-xs text-gray-500">
+                      ID #{{ u.id_usuario }}
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <!-- CONTACTO -->
+              <td class="px-6 py-4">
+
+                <div class="text-sm text-gray-700">
+                  {{ u.correo }}
+                </div>
+
+                <div
+                  *ngIf="u.telefono"
+                  class="text-xs text-gray-500 mt-1"
+                >
+                  {{ u.telefono }}
+                </div>
+
+                <div
+                  *ngIf="!u.telefono"
+                  class="text-xs text-gray-400 mt-1"
+                >
+                  Sin teléfono
+                </div>
+
+              </td>
+
+
+              <!-- ROL -->
+              <td class="px-6 py-4">
+
+                <span
+                  class="inline-flex items-center
+                         px-3 py-1 rounded-full
+                         text-xs font-semibold"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': u.id_rol === 1,
+                    'bg-gray-100 text-gray-700': u.id_rol === 2
+                  }"
+                >
+                  {{ u.rol }}
+                </span>
+
+              </td>
+
+
+              <!-- FECHA -->
+              <td class="px-6 py-4">
+
+                <span class="text-sm text-gray-600">
+                  {{ u.created_at | date:'dd/MM/yyyy' }}
+                </span>
+
+              </td>
+
+
+              <!-- ACCIONES -->
+              <td class="px-6 py-4">
+
+                <div class="flex items-center justify-center gap-2">
+
+                  <!-- EDITAR -->
+                  <button
+                    type="button"
+                    (click)="editarUsuario(u.id_usuario)"
+                    title="Editar usuario"
+                    class="px-3 py-2 rounded-lg
+                           text-blue-700
+                           bg-blue-50 hover:bg-blue-100
+                           transition"
+                  >
+                    Editar
+                  </button>
+
+
+                  <!-- DESACTIVAR -->
+                  <button
+                    type="button"
+                    (click)="confirmarDesactivacion(u.id_usuario)"
+                    title="Desactivar usuario"
+                    class="px-3 py-2 rounded-lg
+                           text-red-700
+                           bg-red-50 hover:bg-red-100
+                           transition"
+                  >
+                    Desactivar
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+
+            <!-- SIN USUARIOS -->
+            <tr *ngIf="usuarios.length === 0">
+
+              <td
+                colspan="5"
+                class="px-6 py-14 text-center"
+              >
+
+                <div class="text-gray-400 text-4xl mb-3">
+                  👤
+                </div>
+
+                <p class="font-medium text-gray-600">
+                  No hay usuarios registrados
+                </p>
+
+                <p class="text-sm text-gray-400 mt-1">
+                  Crea un usuario para comenzar.
+                </p>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODAL CREAR / EDITAR -->
+<!-- ===================================================== -->
+
+<div
+  *ngIf="mostrarFormulario"
+  class="fixed inset-0 z-50
+         flex items-center justify-center
+         p-4"
+>
+
+  <!-- OVERLAY -->
+  <div
+    class="absolute inset-0
+           bg-black/50 backdrop-blur-sm"
+    (click)="cerrarFormulario()"
+  ></div>
+
+
+  <!-- MODAL -->
+  <div
+    class="relative w-full max-w-2xl
+           bg-white rounded-2xl
+           shadow-2xl
+           overflow-hidden"
+  >
+
+    <!-- HEADER MODAL -->
+    <div
+      class="px-6 py-5
+             bg-blue-900 text-white
+             flex items-center justify-between"
+    >
+
+      <div>
+
+        <h3 class="text-xl font-bold">
+          {{ modoEdicion ? 'Editar usuario' : 'Nuevo usuario' }}
+        </h3>
+
+        <p class="text-blue-100 text-sm mt-1">
+          {{
+            modoEdicion
+              ? 'Modifica la información del usuario'
+              : 'Registra un nuevo usuario en el sistema'
+          }}
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        (click)="cerrarFormulario()"
+        class="w-9 h-9 rounded-lg
+               bg-white/10 hover:bg-white/20
+               text-white text-xl
+               transition"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- FORMULARIO -->
+    <div class="p-6">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+
+        <!-- NOMBRE -->
+        <div class="md:col-span-2">
+
+          <label
+            class="block text-sm font-medium
+                   text-gray-700 mb-2"
+          >
+            Nombre completo
+            <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="usuario.nombre"
+            name="nombre"
+            maxlength="150"
+            placeholder="Ej. Juan Pérez"
+            class="w-full
+                   border border-gray-300
+                   rounded-lg px-4 py-2.5
+                   text-gray-700
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500
+                   focus:border-blue-500
+                   transition"
+          />
+
+        </div>
+
+
+        <!-- CORREO -->
+        <div>
+
+          <label
+            class="block text-sm font-medium
+                   text-gray-700 mb-2"
+          >
+            Correo electrónico
+            <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            type="email"
+            [(ngModel)]="usuario.correo"
+            name="correo"
+            placeholder="correo@empresa.com"
+            class="w-full
+                   border border-gray-300
+                   rounded-lg px-4 py-2.5
+                   text-gray-700
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500
+                   focus:border-blue-500
+                   transition"
+          />
+
+        </div>
+
+
+        <!-- TELEFONO -->
+        <div>
+
+          <label
+            class="block text-sm font-medium
+                   text-gray-700 mb-2"
+          >
+            Teléfono
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="usuario.telefono"
+            name="telefono"
+            placeholder="Ej. 844 123 4567"
+            class="w-full
+                   border border-gray-300
+                   rounded-lg px-4 py-2.5
+                   text-gray-700
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500
+                   focus:border-blue-500
+                   transition"
+          />
+
+        </div>
+
+
+        <!-- ROL -->
+        <div>
+
+          <label
+            class="block text-sm font-medium
+                   text-gray-700 mb-2"
+          >
+            Rol
+            <span class="text-red-500">*</span>
+          </label>
+
+          <select
+            [(ngModel)]="usuario.id_rol"
+            name="rol"
+            class="w-full
+                   border border-gray-300
+                   rounded-lg px-4 py-2.5
+                   text-gray-700
+                   bg-white
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500
+                   focus:border-blue-500
+                   transition"
+          >
+
+            <option [ngValue]="null">
+              -- Selecciona un rol --
+            </option>
+
+            <option
+              *ngFor="let rol of roles"
+              [ngValue]="rol.id_rol"
+            >
+              {{ rol.nombre }}
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- CONTRASEÑA -->
+        <div>
+
+          <label
+            class="block text-sm font-medium
+                   text-gray-700 mb-2"
+          >
+            Contraseña
+
+            <span
+              *ngIf="!modoEdicion"
+              class="text-red-500"
+            >
+              *
+            </span>
+
+            <span
+              *ngIf="modoEdicion"
+              class="text-xs text-gray-400 font-normal"
+            >
+              (opcional)
+            </span>
+
+          </label>
+
+          <input
+            type="password"
+            [(ngModel)]="usuario.contrasena"
+            name="contrasena"
+            placeholder="Mínimo 6 caracteres"
+            class="w-full
+                   border border-gray-300
+                   rounded-lg px-4 py-2.5
+                   text-gray-700
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500
+                   focus:border-blue-500
+                   transition"
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- INFO -->
+      <div
+        class="mt-5 p-3
+               bg-blue-50
+               border border-blue-100
+               rounded-lg"
+      >
+
+        <p class="text-xs text-blue-700">
+
+          <span class="font-semibold">Nota:</span>
+
+          {{
+            modoEdicion
+              ? 'Si dejas la contraseña vacía, se conservará la contraseña actual.'
+              : 'La contraseña debe tener al menos 6 caracteres.'
+          }}
+
+        </p>
+
+      </div>
+
+
+      <!-- BOTONES -->
+      <div
+        class="flex flex-col-reverse sm:flex-row
+               justify-end gap-3
+               mt-6 pt-5
+               border-t border-gray-200"
+      >
+
+        <button
+          type="button"
+          (click)="cerrarFormulario()"
+          class="px-5 py-2.5
+                 rounded-lg
+                 border border-gray-300
+                 text-gray-700
+                 hover:bg-gray-50
+                 transition"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          (click)="guardarUsuario()"
+          class="px-5 py-2.5
+                 rounded-lg
+                 bg-blue-900
+                 hover:bg-blue-800
+                 text-white
+                 font-medium
+                 shadow-sm
+                 transition"
+        >
+          {{ modoEdicion ? 'Guardar cambios' : 'Crear usuario' }}
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODAL DESACTIVAR -->
+<!-- ===================================================== -->
+
+<div
+  *ngIf="usuarioAEliminar !== null"
+  class="fixed inset-0 z-[60]
+         flex items-center justify-center
+         p-4"
+>
+
+  <!-- OVERLAY -->
+  <div
+    class="absolute inset-0
+           bg-black/50 backdrop-blur-sm"
+    (click)="cancelarDesactivacion()"
+  ></div>
+
+
+  <!-- MODAL -->
+  <div
+    class="relative
+           bg-white
+           w-full max-w-md
+           rounded-2xl
+           shadow-2xl
+           p-6"
+  >
+
+    <!-- ICONO -->
+    <div
+      class="mx-auto mb-4
+             w-12 h-12
+             rounded-full
+             bg-red-100
+             text-red-600
+             flex items-center justify-center
+             text-xl"
+    >
+      !
+    </div>
+
+
+    <h3
+      class="text-xl font-bold
+             text-gray-800
+             text-center"
+    >
+      Desactivar usuario
+    </h3>
+
+
+    <p
+      class="text-sm text-gray-500
+             text-center
+             mt-2"
+    >
+      ¿Estás seguro de que deseas desactivar este usuario?
+    </p>
+
+
+    <p
+      class="text-xs text-gray-400
+             text-center mt-2"
+    >
+      El usuario dejará de aparecer entre los usuarios activos.
+    </p>
+
+
+    <!-- BOTONES -->
+    <div
+      class="flex justify-center
+             gap-3 mt-6"
+    >
+
+      <button
+        type="button"
+        (click)="cancelarDesactivacion()"
+        class="px-5 py-2.5
+               rounded-lg
+               bg-gray-100
+               hover:bg-gray-200
+               text-gray-700
+               transition"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        (click)="desactivarUsuario()"
+        class="px-5 py-2.5
+               rounded-lg
+               bg-red-600
+               hover:bg-red-700
+               text-white
+               font-medium
+               transition"
+      >
+        Sí, desactivar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

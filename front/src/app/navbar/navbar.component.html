@@ -1,29 +1,152 @@
-<nav class="bg-gray-800 text-white px-6 py-4 shadow flex justify-between items-center w-full">
-  <div class="text-xl font-semibold flex-1 text-left">Sistema Ventas</div>
-  <ul class="flex justify-between space-x-4">
-    <li *ngIf="!sesionActiva">
-      <a routerLink="/login" routerLinkActive="font-bold" class="hover:text-yellow-300">Iniciar Sesion</a>
-    </li>
-    <li *ngIf="sesionActiva">
-      <a routerLink="/dashboard" routerLinkActive="font-bold" class="hover:text-yellow-300">Inicio</a>
-    </li>
-    <li *ngIf="sesionActiva">
-      <a routerLink="/clientes" routerLinkActive="font-bold" class="hover:text-yellow-300">Clientes</a>
-    </li>
-    <li *ngIf="sesionActiva">
-      <a routerLink="/articulos" routerLinkActive="font-bold" class="hover:text-yellow-300">Articulos</a>
-    </li>
-    <li *ngIf="sesionActiva">
-      <a routerLink="/categorias" routerLinkActive="font-bold" class="hover:text-yellow-300">Categorias</a>
-    </li>
-    <li *ngIf="sesionActiva">
-      <a routerLink="/ventas" routerLinkActive="font-bold" class="hover:text-yellow-300">Ventas</a>
-    </li>
-    
-    <li *ngIf="sesionActiva">
-      <button (click)="cerrarSesion()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">
-        Cerrar sesion
-      </button>
-    </li>
-  </ul>
+<nav class="w-full bg-white border-b border-gray-200 shadow-sm">
+
+  <div class="max-w-7xl mx-auto px-6 py-3">
+
+    <div class="flex items-center justify-between gap-6">
+
+      <!-- LOGO / NOMBRE -->
+      <div class="flex items-center gap-3 shrink-0">
+
+        <div
+          class="w-10 h-10 rounded-xl bg-blue-900 flex items-center justify-center shadow-sm"
+        >
+          <span class="text-white font-bold text-lg">
+            SV
+          </span>
+        </div>
+
+        <div class="hidden sm:block">
+          <h1 class="text-lg font-bold text-gray-900 leading-none">
+            Sistema Ventas
+          </h1>
+
+          <p class="text-xs text-gray-500 mt-1">
+            Gestión administrativa
+          </p>
+        </div>
+
+      </div>
+
+
+      <!-- NAVEGACIÓN -->
+      <ul
+        *ngIf="sesionActiva"
+        class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 overflow-x-auto"
+      >
+
+        <!-- INICIO -->
+        <li>
+          <a
+            routerLink="/dashboard"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Inicio
+          </a>
+        </li>
+
+        <!-- USUARIOS -->
+        <li>
+          <a
+            routerLink="/usuarios"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Usuarios
+          </a>
+        </li>
+
+        <!-- CLIENTES -->
+        <li>
+          <a
+            routerLink="/clientes"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Clientes
+          </a>
+        </li>
+
+        <!-- ARTÍCULOS -->
+        <li>
+          <a
+            routerLink="/articulos"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Artículos
+          </a>
+        </li>
+
+        <!-- CATEGORÍAS -->
+        <li>
+          <a
+            routerLink="/categorias"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Categorías
+          </a>
+        </li>
+
+        <!-- VENTAS -->
+        <li>
+          <a
+            routerLink="/ventas"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Ventas
+          </a>
+        </li>
+
+      </ul>
+
+
+      <!-- SESIÓN -->
+      <div class="flex items-center gap-3 shrink-0">
+
+        <!-- LOGIN -->
+        <a
+          *ngIf="!sesionActiva"
+          routerLink="/login"
+          class="px-4 py-2 rounded-lg text-sm font-semibold
+                 text-blue-900 border border-blue-900
+                 hover:bg-blue-900 hover:text-white
+                 transition-all duration-200"
+        >
+          Iniciar sesión
+        </a>
+
+        <!-- CERRAR SESIÓN -->
+        <button
+          *ngIf="sesionActiva"
+          (click)="cerrarSesion()"
+          class="flex items-center gap-2 px-4 py-2 rounded-lg
+                 bg-red-50 text-red-600 border border-red-100
+                 hover:bg-red-600 hover:text-white
+                 transition-all duration-200 text-sm font-semibold"
+        >
+          Cerrar sesión
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </nav>
