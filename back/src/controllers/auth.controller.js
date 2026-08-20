@@ -11,7 +11,7 @@ exports.login = async (req, res) => {
 
     if (!correo || !contrasena) {
         return res.status(400).json({
-            mensaje: 'Usuario y contraseña son obligatorios.'
+            mensaje: 'Correo y contraseña son obligatorios.'
         });
     }
 

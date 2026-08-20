@@ -13,11 +13,11 @@ const {
     activarCategoria
 } = require('../controllers/categorias.controller');
 
-router.get('/', verificarToken, verificarRol(ROLES.ADMIN),obtenerCategorias);
-router.get('/:id', verificarToken, verificarRol(ROLES.ADMIN),obtenerCategoriaPorId);
-router.post('/', verificarToken, verificarRol(ROLES.ADMIN),crearCategoria);
-router.put('/:id', verificarToken, verificarRol(ROLES.ADMIN), actualizarCategoria);
-router.patch('/:id/desactivar', verificarToken, verificarRol(ROLES.ADMIN),desactivarCategoria);
-router.patch('/:id/activar', verificarToken, verificarRol(ROLES.ADMIN),activarCategoria);
+router.get('/', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR),obtenerCategorias);
+router.get('/:id', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR),obtenerCategoriaPorId);
+router.post('/', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR),crearCategoria);
+router.put('/:id', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR), actualizarCategoria);
+router.patch('/:id/desactivar', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR),desactivarCategoria);
+router.patch('/:id/activar', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR),activarCategoria);
 
 module.exports = router;

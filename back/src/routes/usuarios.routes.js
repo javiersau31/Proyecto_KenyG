@@ -14,11 +14,11 @@ const {
 } = require('../controllers/usuarios.controller');
 
 
-router.get('/', verificarToken, verificarRol(ROLES.ADMIN),obtenerUsuarios);
-router.get('/:id', verificarToken, verificarRol(ROLES.ADMIN),obtenerUsuarioPorId);
-router.post('/', verificarToken, verificarRol(ROLES.ADMIN), crearUsuario);
-router.put('/:id', verificarToken, verificarRol(ROLES.ADMIN), actualizarUsuario);
-router.patch('/:id/desactivar', verificarToken, verificarRol(ROLES.ADMIN), desactivarUsuario);
-router.patch('/:id/activar', verificarToken, verificarRol(ROLES.ADMIN), activarUsuario);
+router.get('/', verificarToken, verificarRol(ROLES.ADMIN,ROLES.VENDEDOR),obtenerUsuarios);
+router.get('/:id', verificarToken, verificarRol(ROLES.ADMIN,ROLES.VENDEDOR),obtenerUsuarioPorId);
+router.post('/', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR), crearUsuario);
+router.put('/:id', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR), actualizarUsuario);
+router.patch('/:id/desactivar', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR), desactivarUsuario);
+router.patch('/:id/activar', verificarToken, verificarRol(ROLES.ADMIN, ROLES.VENDEDOR), activarUsuario);
 
 module.exports = router;

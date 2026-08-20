@@ -4,7 +4,9 @@ const validarVenta = (datos) => {
 
     const { id_cliente } = datos;
 
-    if (!id_cliente || Number.isNaN(Number(id_cliente))) {
+    const idCliente = Number(id_cliente);
+
+    if (!id_cliente || Number.isNaN(idCliente) || idCliente <= 0) {
         return {
             valido: false,
             mensaje: 'El cliente es obligatorio.'
@@ -14,51 +16,66 @@ const validarVenta = (datos) => {
     return {
         valido: true,
         datos: {
-            id_cliente: Number(id_cliente)
+            id_cliente: idCliente
         }
     };
-
 };
+
 
 const validarDetalleVenta = (datos) => {
 
-    const { id_venta, id_articulo, cantidad, precio_unitario } = datos;
+    const {
+        id_venta,
+        id_articulo,
+        cantidad
+    } = datos;
 
-    if (!id_venta || !id_articulo || !cantidad || !precio_unitario) {
+    const idVenta = Number(id_venta);
+    const idArticulo = Number(id_articulo);
+    const cantidadNum = Number(cantidad);
+
+    if (!id_venta || !id_articulo || !cantidad) {
         return {
             valido: false,
             mensaje: MESSAGES.DATOS_OBLIGATORIOS
         };
     }
 
-    const cantidadNum = Number(cantidad);
-    const precioNum = Number(precio_unitario);
-
-    if (Number.isNaN(cantidadNum) || Number.isNaN(precioNum)) {
+    if (
+        Number.isNaN(idVenta) ||
+        Number.isNaN(idArticulo) ||
+        Number.isNaN(cantidadNum)
+    ) {
         return {
             valido: false,
-            mensaje: 'Cantidad y precio unitario deben ser numéricos.'
+            mensaje: 'Los datos de la venta deben ser numéricos.'
         };
     }
 
-    if (cantidadNum <= 0 || precioNum <= 0) {
+    if (idVenta <= 0 || idArticulo <= 0) {
         return {
             valido: false,
-            mensaje: 'Cantidad y precio unitario deben ser mayores a cero.'
+            mensaje: 'Los identificadores no son válidos.'
+        };
+    }
+
+    if (cantidadNum <= 0) {
+        return {
+            valido: false,
+            mensaje: 'La cantidad debe ser mayor a cero.'
         };
     }
 
     return {
         valido: true,
         datos: {
-            id_venta: Number(id_venta),
-            id_articulo: Number(id_articulo),
-            cantidad: cantidadNum,
-            precio_unitario: precioNum
+            id_venta: idVenta,
+            id_articulo: idArticulo,
+            cantidad: cantidadNum
         }
     };
-
 };
+
 
 module.exports = {
     validarVenta,

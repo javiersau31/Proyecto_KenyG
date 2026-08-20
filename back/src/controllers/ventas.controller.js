@@ -1,13 +1,23 @@
 const MESSAGES = require('../constants/messages');
-const { validarVenta, validarDetalleVenta } = require('../validators/ventas.validators');
+
+const {
+    validarVenta,
+    validarDetalleVenta
+} = require('../validators/ventas.validators');
+
 const ventasService = require('../services/ventas.service');
 
-// Listar ventas
+
+// ======================================================
+// LISTAR VENTAS
+// ======================================================
+
 exports.obtenerVentas = async (req, res) => {
 
     try {
 
         const ventas = await ventasService.obtenerVentas();
+
         res.json(ventas);
 
     } catch (error) {
@@ -22,7 +32,11 @@ exports.obtenerVentas = async (req, res) => {
 
 };
 
-// Obtener una venta por ID
+
+// ======================================================
+// OBTENER VENTA POR ID
+// ======================================================
+
 exports.obtenerVentaPorId = async (req, res) => {
 
     try {
@@ -30,17 +44,21 @@ exports.obtenerVentaPorId = async (req, res) => {
         const { id } = req.params;
 
         if (Number.isNaN(Number(id))) {
+
             return res.status(400).json({
                 mensaje: 'El ID de la venta es inválido.'
             });
+
         }
 
         const venta = await ventasService.obtenerVentaPorId(id);
 
         if (!venta) {
+
             return res.status(404).json({
                 mensaje: MESSAGES.NO_ENCONTRADO
             });
+
         }
 
         res.json(venta);
@@ -57,7 +75,11 @@ exports.obtenerVentaPorId = async (req, res) => {
 
 };
 
-// Crear una venta (encabezado, sin detalle todavía)
+
+// ======================================================
+// CREAR VENTA
+// ======================================================
+
 exports.crearVenta = async (req, res) => {
 
     try {
@@ -65,16 +87,22 @@ exports.crearVenta = async (req, res) => {
         const validacion = validarVenta(req.body);
 
         if (!validacion.valido) {
+
             return res.status(400).json({
                 mensaje: validacion.mensaje
             });
+
         }
 
-        // req.usuario lo agrega auth.middleware.js a partir del JWTT
+        // El middleware de autenticación agrega req.usuario
         const id_usuario = req.usuario.id_usuario;
+
         const { id_cliente } = validacion.datos;
 
-        const id_venta = await ventasService.crearVenta(id_cliente, id_usuario);
+        const id_venta = await ventasService.crearVenta(
+            id_cliente,
+            id_usuario
+        );
 
         return res.status(201).json({
             mensaje: 'Venta creada correctamente.',
@@ -93,9 +121,12 @@ exports.crearVenta = async (req, res) => {
 
 };
 
-// Eliminar una venta completa
-exports.eliminarVenta = async (req, res) => {
 
+// ======================================================
+// ELIMINAR VENTA COMPLETA
+// ======================================================
+
+exports.eliminarVenta = async (req, res) => {
     try {
 
         const { id } = req.params;
@@ -106,7 +137,14 @@ exports.eliminarVenta = async (req, res) => {
             });
         }
 
-        await ventasService.eliminarVenta(id);
+        const resultado =
+            await ventasService.eliminarVenta(Number(id));
+
+        if (!resultado.ok) {
+            return res.status(resultado.status).json({
+                mensaje: resultado.mensaje
+            });
+        }
 
         return res.json({
             mensaje: 'Venta eliminada correctamente.'
@@ -119,13 +157,14 @@ exports.eliminarVenta = async (req, res) => {
         return res.status(500).json({
             mensaje: MESSAGES.ERROR_INTERNO
         });
-
     }
-
 };
 
-// Detalle de venta
-// Agregar un artículo a la venta
+
+// ======================================================
+// AGREGAR DETALLE A UNA VENTA
+// ======================================================
+
 exports.agregarDetalle = async (req, res) => {
 
     try {
@@ -133,21 +172,29 @@ exports.agregarDetalle = async (req, res) => {
         const validacion = validarDetalleVenta(req.body);
 
         if (!validacion.valido) {
+
             return res.status(400).json({
                 mensaje: validacion.mensaje
             });
+
         }
 
-        const resultado = await ventasService.agregarDetalle(validacion.datos);
+        const resultado = await ventasService.agregarDetalle(
+            validacion.datos
+        );
 
         if (!resultado.ok) {
+
             return res.status(resultado.status).json({
                 mensaje: resultado.mensaje
             });
+
         }
 
         return res.status(201).json({
-            mensaje: 'Artículo agregado a la venta correctamente.'
+            mensaje: 'Artículo agregado a la venta correctamente.',
+            precio_unitario: resultado.precio_unitario,
+            subtotal: resultado.subtotal
         });
 
     } catch (error) {
@@ -162,7 +209,11 @@ exports.agregarDetalle = async (req, res) => {
 
 };
 
-// Obtener el detalle de una venta
+
+// ======================================================
+// OBTENER DETALLES DE UNA VENTA
+// ======================================================
+
 exports.obtenerDetallesPorVenta = async (req, res) => {
 
     try {
@@ -170,12 +221,16 @@ exports.obtenerDetallesPorVenta = async (req, res) => {
         const { id_venta } = req.params;
 
         if (Number.isNaN(Number(id_venta))) {
+
             return res.status(400).json({
                 mensaje: 'El ID de la venta es inválido.'
             });
+
         }
 
-        const detalles = await ventasService.obtenerDetallesPorVenta(id_venta);
+        const detalles =
+            await ventasService.obtenerDetallesPorVenta(id_venta);
+
         res.json(detalles);
 
     } catch (error) {
@@ -190,32 +245,50 @@ exports.obtenerDetallesPorVenta = async (req, res) => {
 
 };
 
-// Editar una línea de detalle
+
+// ======================================================
+// EDITAR DETALLE
+// ======================================================
+
 exports.editarDetalle = async (req, res) => {
 
     try {
 
         const { id_detalle } = req.params;
-        const { cantidad, precio_unitario } = req.body;
+
+        const { cantidad } = req.body;
 
         if (Number.isNaN(Number(id_detalle))) {
+
             return res.status(400).json({
                 mensaje: 'El ID del detalle es inválido.'
             });
+
         }
 
-        if (!cantidad || !precio_unitario || cantidad <= 0 || precio_unitario <= 0) {
+        if (
+            !Number.isInteger(Number(cantidad)) ||
+            Number(cantidad) <= 0
+        ) {
+
             return res.status(400).json({
-                mensaje: 'Cantidad y precio unitario deben ser mayores a cero.'
+                mensaje: 'La cantidad debe ser un número entero mayor a cero.'
             });
+
         }
 
-        const resultado = await ventasService.editarDetalle(id_detalle, cantidad, precio_unitario);
+        const resultado =
+            await ventasService.editarDetalle(
+                id_detalle,
+                Number(cantidad)
+            );
 
         if (!resultado.ok) {
+
             return res.status(resultado.status).json({
                 mensaje: resultado.mensaje
             });
+
         }
 
         return res.json({
@@ -234,9 +307,12 @@ exports.editarDetalle = async (req, res) => {
 
 };
 
-// Eliminar una línea de detalle
-exports.eliminarDetalle = async (req, res) => {
 
+// ======================================================
+// ELIMINAR DETALLE
+// ======================================================
+
+exports.eliminarDetalle = async (req, res) => {
     try {
 
         const { id_detalle } = req.params;
@@ -247,7 +323,8 @@ exports.eliminarDetalle = async (req, res) => {
             });
         }
 
-        const resultado = await ventasService.eliminarDetalle(id_detalle);
+        const resultado =
+            await ventasService.eliminarDetalle(id_detalle);
 
         if (!resultado.ok) {
             return res.status(resultado.status).json({
@@ -266,12 +343,14 @@ exports.eliminarDetalle = async (req, res) => {
         return res.status(500).json({
             mensaje: MESSAGES.ERROR_INTERNO
         });
-
     }
-
 };
 
-// Recalcular el total de una venta a partir de sus detalles
+
+// ======================================================
+// RECALCULAR TOTAL
+// ======================================================
+
 exports.actualizarTotal = async (req, res) => {
 
     try {
@@ -279,9 +358,11 @@ exports.actualizarTotal = async (req, res) => {
         const { id_venta } = req.params;
 
         if (Number.isNaN(Number(id_venta))) {
+
             return res.status(400).json({
                 mensaje: 'El ID de la venta es inválido.'
             });
+
         }
 
         await ventasService.recalcularTotal(id_venta);
