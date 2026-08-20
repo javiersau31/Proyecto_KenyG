@@ -1,10 +1,339 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
-  <div class="bg-white shadow-2xl rounded-2xl p-10 max-w-xl text-center">
-    <h1 class="text-4xl font-extrabold text-blue-800 mb-4">¡Bienvenido al Sistema de Ventas!</h1>
-    <p class="text-gray-700 text-lg mb-6">
-      Gestiona tus ventas, articulos y clientes de forma rapida y sencilla.
-    </p>
+<div class="min-h-screen bg-slate-50 p-6 md:p-8">
 
-    <img src="https://cdn-icons-png.flaticon.com/512/1946/1946436.png" alt="ventas" class="mt-8 mx-auto w-32 h-32 opacity-90" />
+  <!-- Header -->
+  <div class="mb-8">
+    <div>
+      <p class="text-sm font-medium text-blue-600 mb-1">
+        Panel principal
+      </p>
+
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900">
+        Bienvenido al sistema
+      </h1>
+
+      <p class="text-slate-500 mt-2">
+        Administra tus ventas, clientes y artículos desde un solo lugar.
+      </p>
+    </div>
   </div>
+
+
+  <!-- Tarjetas principales -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+
+    <!-- Ventas -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6
+                shadow-sm hover:shadow-md transition-shadow">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <div class="w-11 h-11 rounded-xl bg-blue-50
+                    flex items-center justify-center">
+
+          <svg class="w-6 h-6 text-blue-600"
+               fill="none"
+               stroke="currentColor"
+               viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3v18h18M7 16l4-5 3 3 5-7" />
+          </svg>
+
+        </div>
+
+        <span class="text-xs font-semibold text-blue-600
+                     bg-blue-50 px-2.5 py-1 rounded-full">
+          Ventas
+        </span>
+
+      </div>
+
+      <p class="text-sm text-slate-500">
+        Ventas registradas
+      </p>
+
+      <p class="text-3xl font-bold text-slate-900 mt-1">
+        —
+      </p>
+
+    </div>
+
+
+    <!-- Clientes -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6
+                shadow-sm hover:shadow-md transition-shadow">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <div class="w-11 h-11 rounded-xl bg-emerald-50
+                    flex items-center justify-center">
+
+          <svg class="w-6 h-6 text-emerald-600"
+               fill="none"
+               stroke="currentColor"
+               viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m4-4a4 4 0 100-8 4 4 0 000 8z" />
+
+          </svg>
+
+        </div>
+
+        <span class="text-xs font-semibold text-emerald-600
+                     bg-emerald-50 px-2.5 py-1 rounded-full">
+          Clientes
+        </span>
+
+      </div>
+
+      <p class="text-sm text-slate-500">
+        Clientes registrados
+      </p>
+
+      <p class="text-3xl font-bold text-slate-900 mt-1">
+        —
+      </p>
+
+    </div>
+
+
+    <!-- Artículos -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6
+                shadow-sm hover:shadow-md transition-shadow">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <div class="w-11 h-11 rounded-xl bg-violet-50
+                    flex items-center justify-center">
+
+          <svg class="w-6 h-6 text-violet-600"
+               fill="none"
+               stroke="currentColor"
+               viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+
+          </svg>
+
+        </div>
+
+        <span class="text-xs font-semibold text-violet-600
+                     bg-violet-50 px-2.5 py-1 rounded-full">
+          Inventario
+        </span>
+
+      </div>
+
+      <p class="text-sm text-slate-500">
+        Artículos registrados
+      </p>
+
+      <p class="text-3xl font-bold text-slate-900 mt-1">
+        —
+      </p>
+
+    </div>
+
+
+    <!-- Estado -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6
+                shadow-sm hover:shadow-md transition-shadow">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <div class="w-11 h-11 rounded-xl bg-amber-50
+                    flex items-center justify-center">
+
+          <svg class="w-6 h-6 text-amber-600"
+               fill="none"
+               stroke="currentColor"
+               viewBox="0 0 24 24">
+
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+          </svg>
+
+        </div>
+
+        <span class="text-xs font-semibold text-amber-600
+                     bg-amber-50 px-2.5 py-1 rounded-full">
+          Sistema
+        </span>
+
+      </div>
+
+      <p class="text-sm text-slate-500">
+        Estado del sistema
+      </p>
+
+      <div class="flex items-center gap-2 mt-2">
+
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+
+        <span class="text-lg font-semibold text-slate-900">
+          Operativo
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Sección inferior -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+
+    <!-- Acciones rápidas -->
+    <div class="xl:col-span-2 bg-white border border-slate-200
+                rounded-2xl shadow-sm p-6">
+
+      <div class="mb-6">
+        <h2 class="text-lg font-bold text-slate-900">
+          Acciones rápidas
+        </h2>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Accede rápidamente a las funciones principales.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <a
+          routerLink="/ventas"
+          class="group border border-slate-200 rounded-xl p-5
+                 hover:border-blue-300 hover:bg-blue-50/50
+                 transition-all cursor-pointer">
+
+          <div class="w-10 h-10 rounded-lg bg-blue-50
+                      flex items-center justify-center mb-4">
+
+            <span class="text-blue-600 text-xl font-bold">
+              $
+            </span>
+
+          </div>
+
+          <h3 class="font-semibold text-slate-900">
+            Nueva venta
+          </h3>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Registrar una nueva venta
+          </p>
+
+        </a>
+
+
+        <a
+          routerLink="/clientes"
+          class="group border border-slate-200 rounded-xl p-5
+                 hover:border-emerald-300 hover:bg-emerald-50/50
+                 transition-all cursor-pointer">
+
+          <div class="w-10 h-10 rounded-lg bg-emerald-50
+                      flex items-center justify-center mb-4">
+
+            <span class="text-emerald-600 text-xl">
+              +
+            </span>
+
+          </div>
+
+          <h3 class="font-semibold text-slate-900">
+            Clientes
+          </h3>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Administrar clientes
+          </p>
+
+        </a>
+
+
+        <a
+          routerLink="/articulos"
+          class="group border border-slate-200 rounded-xl p-5
+                 hover:border-violet-300 hover:bg-violet-50/50
+                 transition-all cursor-pointer">
+
+          <div class="w-10 h-10 rounded-lg bg-violet-50
+                      flex items-center justify-center mb-4">
+
+            <span class="text-violet-600 text-xl">
+              +
+            </span>
+
+          </div>
+
+          <h3 class="font-semibold text-slate-900">
+            Inventario
+          </h3>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Administrar artículos
+          </p>
+
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <!-- Información -->
+    <div class="bg-slate-900 rounded-2xl shadow-sm p-6 text-white">
+
+      <div class="w-11 h-11 rounded-xl bg-blue-600
+                  flex items-center justify-center mb-5">
+
+        <span class="text-xl font-bold">
+          ✓
+        </span>
+
+      </div>
+
+      <h2 class="text-xl font-bold">
+        Sistema de ventas
+      </h2>
+
+      <p class="text-slate-400 text-sm leading-relaxed mt-3">
+        Gestiona clientes, inventario y ventas desde una plataforma
+        centralizada diseñada para facilitar la operación diaria.
+      </p>
+
+      <div class="border-t border-slate-700 mt-6 pt-5">
+
+        <p class="text-xs text-slate-500 uppercase tracking-wider">
+          Sesión
+        </p>
+
+        <div class="flex items-center gap-2 mt-2">
+
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+
+          <span class="text-sm text-slate-300">
+            Sesión activa
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </div>

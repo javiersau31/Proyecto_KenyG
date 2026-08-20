@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from '../core/services/api.services';
-import { ApiResponse } from '../core/models/api-response.model';
+import { ApiService } from '../core/services/api.service';
 
 export interface Articulo {
   id_articulo?: number;
@@ -9,31 +8,55 @@ export interface Articulo {
   descripcion: string;
   precio: number;
   existencia: number;
+  id_categoria: number;
+  categoria?: string;
+}
+
+export interface RespuestaArticulo {
+  mensaje: string;
+  id_articulo?: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ArticulosService {
+
   constructor(private api: ApiService) {}
 
-  getArticulos(): Observable<ApiResponse<Articulo[]>> {
+  obtenerArticulos(): Observable<Articulo[]> {
     return this.api.get<Articulo[]>('articulos');
   }
 
-  getArticulo(id: number): Observable<ApiResponse<Articulo>> {
+  obtenerArticuloPorId(id: number): Observable<Articulo> {
     return this.api.get<Articulo>(`articulos/${id}`);
   }
 
-  crearArticulo(articulo: Articulo): Observable<ApiResponse<any>> {
-    return this.api.post<any>('articulos', articulo);
+  crearArticulo(datos: Articulo): Observable<RespuestaArticulo> {
+    return this.api.post<RespuestaArticulo>('articulos', datos);
   }
 
-  actualizarArticulo(id: number, articulo: Articulo): Observable<ApiResponse<any>> {
-    return this.api.put<any>(`articulos/${id}`, articulo);
+  actualizarArticulo(
+    id: number,
+    datos: Articulo
+  ): Observable<RespuestaArticulo> {
+    return this.api.put<RespuestaArticulo>(
+      `articulos/${id}`,
+      datos
+    );
   }
 
-  eliminarArticulo(id: number): Observable<ApiResponse<any>> {
-    return this.api.delete<any>(`articulos/${id}`);
+  desactivarArticulo(id: number): Observable<RespuestaArticulo> {
+    return this.api.patch<RespuestaArticulo>(
+      `articulos/${id}/desactivar`,
+      {}
+    );
+  }
+
+  activarArticulo(id: number): Observable<RespuestaArticulo> {
+    return this.api.patch<RespuestaArticulo>(
+      `articulos/${id}/activar`,
+      {}
+    );
   }
 }

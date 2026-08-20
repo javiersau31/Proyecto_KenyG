@@ -1,117 +1,468 @@
 import { Component, OnInit } from '@angular/core';
-import { ArticulosService, Articulo } from '../servicios/articulos.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+
+import {
+  ArticulosService,
+  Articulo
+} from '../servicios/articulos.service';
+
+import {
+  CategoriasService,
+  Categoria
+} from '../servicios/categorias.service';
 
 @Component({
   selector: 'app-articulos',
   standalone: true,
-  templateUrl: './articulos.component.html',
-  styleUrl: './articulos.component.css',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule],
+  templateUrl: './articulos.component.html'
 })
 export class ArticulosComponent implements OnInit {
-  articulos: Articulo[] = [];
-  articuloForm: FormGroup;
-  modoEditar: boolean = false;
-  idEditando: number | null = null;
-  articuloAEliminar: number | null = null;
-  pestaniaActiva: 'formulario' | 'tabla' = 'formulario'; 
 
-  constructor(private servicio: ArticulosService, private fb: FormBuilder, private toastr: ToastrService) {
-    this.articuloForm = this.fb.group({
-      nombre: ['', Validators.required],
-      descripcion: [''],
-      precio: ['', [Validators.required, Validators.min(0.01)]],
-      existencia: ['', [Validators.required, Validators.min(0)]]
-    });
-  }
+  // =========================
+  // DATOS
+  // =========================
+
+  articulos: Articulo[] = [];
+  categorias: Categoria[] = [];
+
+  terminoBusqueda: string = '';
+
+  mostrarFormulario: boolean = false;
+
+  articuloEditando: Articulo | null = null;
+  articuloAEliminar: number | null = null;
+
+  nuevoArticulo: Articulo = this.crearArticuloVacio();
+
+
+  constructor(
+    private articulosService: ArticulosService,
+    private categoriasService: CategoriasService,
+    private toastr: ToastrService
+  ) {}
+
+
+  // =========================
+  // INICIO
+  // =========================
 
   ngOnInit(): void {
-    this.obtenerArticulos();
+
+    this.cargarArticulos();
+    this.cargarCategorias();
+
   }
 
-  obtenerArticulos() {
-    this.servicio.getArticulos().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.articulos = response.data; // <--- AQUÍ LEES LOS DATOS GLOBALES
-        }
+
+  // =========================
+  // ARTÍCULO VACÍO
+  // =========================
+
+  private crearArticuloVacio(): Articulo {
+
+    return {
+      nombre: '',
+      descripcion: '',
+      precio: 0,
+      existencia: 0,
+      id_categoria: 0
+    };
+
+  }
+
+
+  // =========================
+  // OBTENER ARTÍCULOS
+  // =========================
+
+  cargarArticulos(): void {
+
+    this.articulosService.obtenerArticulos().subscribe({
+
+      next: (articulos) => {
+
+        this.articulos = articulos;
+
       },
-      error: (err) => {
-        this.toastr.error(err.error?.message || 'Error al cargar los artículos', 'Error');
+
+      error: (error) => {
+
+        console.error(error);
+
+        this.toastr.error(
+          error.error?.mensaje ||
+          'Error al cargar los artículos',
+          'Error'
+        );
+
       }
+
     });
+
   }
 
-  guardarArticulo() {
-    if (this.articuloForm.invalid) {
-      this.articuloForm.markAllAsTouched(); 
+
+  // =========================
+  // OBTENER CATEGORÍAS
+  // =========================
+
+  cargarCategorias(): void {
+
+    this.categoriasService.obtenerCategorias().subscribe({
+
+      next: (categorias) => {
+
+        this.categorias = categorias;
+
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+        this.toastr.error(
+          error.error?.mensaje ||
+          'Error al cargar las categorías',
+          'Error'
+        );
+
+      }
+
+    });
+
+  }
+
+
+  // =========================
+  // FILTRO
+  // =========================
+
+  get articulosFiltrados(): Articulo[] {
+
+    const termino = this.terminoBusqueda
+      .trim()
+      .toLowerCase();
+
+    if (!termino) {
+      return this.articulos;
+    }
+
+    return this.articulos.filter(articulo =>
+
+      articulo.nombre.toLowerCase().includes(termino) ||
+
+      articulo.descripcion.toLowerCase().includes(termino) ||
+
+      (articulo.categoria ?? '')
+        .toLowerCase()
+        .includes(termino)
+
+    );
+
+  }
+
+
+  // =========================
+  // EXISTENCIAS TOTALES
+  // =========================
+
+  obtenerExistenciasTotales(): number {
+
+    return this.articulos.reduce(
+      (total, articulo) =>
+        total + Number(articulo.existencia || 0),
+      0
+    );
+
+  }
+
+
+  // =========================
+  // STOCK BAJO
+  // =========================
+
+  obtenerArticulosStockBajo(): number {
+
+    return this.articulos.filter(
+      articulo =>
+        articulo.existencia > 0 &&
+        articulo.existencia <= 10
+    ).length;
+
+  }
+
+
+  // =========================
+  // ABRIR FORMULARIO
+  // =========================
+
+  abrirFormulario(): void {
+
+    this.articuloEditando = null;
+
+    this.nuevoArticulo = this.crearArticuloVacio();
+
+    this.mostrarFormulario = true;
+
+  }
+
+
+  // =========================
+  // CERRAR FORMULARIO
+  // =========================
+
+  cerrarFormulario(): void {
+
+    this.mostrarFormulario = false;
+
+    this.articuloEditando = null;
+
+    this.nuevoArticulo = this.crearArticuloVacio();
+
+  }
+
+
+  // =========================
+  // CREAR / ACTUALIZAR
+  // =========================
+
+  guardarArticulo(): void {
+
+    if (this.articuloEditando) {
+
+      this.guardarEdicion();
+
+    } else {
+
+      this.agregarArticulo();
+
+    }
+
+  }
+
+
+  // =========================
+  // CREAR
+  // =========================
+
+  agregarArticulo(): void {
+
+    if (
+      !this.nuevoArticulo.nombre.trim() ||
+      !this.nuevoArticulo.descripcion.trim() ||
+      this.nuevoArticulo.precio <= 0 ||
+      this.nuevoArticulo.existencia < 0 ||
+      this.nuevoArticulo.id_categoria <= 0
+    ) {
+
+      this.toastr.warning(
+        'Completa correctamente todos los campos.',
+        'Datos inválidos'
+      );
+
+      return;
+
+    }
+
+
+    this.articulosService
+      .crearArticulo(this.nuevoArticulo)
+      .subscribe({
+
+        next: (respuesta) => {
+
+          this.toastr.success(
+            respuesta.mensaje,
+            'Artículo creado'
+          );
+
+          this.cerrarFormulario();
+
+          this.cargarArticulos();
+
+        },
+
+        error: (error) => {
+
+          console.error(error);
+
+          this.toastr.error(
+            error.error?.mensaje ||
+            'No se pudo crear el artículo',
+            'Error'
+          );
+
+        }
+
+      });
+
+  }
+
+
+  // =========================
+  // EDITAR
+  // =========================
+
+  activarEdicion(articulo: Articulo): void {
+
+    this.articuloEditando = {
+      ...articulo
+    };
+
+    this.mostrarFormulario = true;
+
+  }
+
+
+  cancelarEdicion(): void {
+
+    this.articuloEditando = null;
+
+    this.mostrarFormulario = false;
+
+  }
+
+
+  guardarEdicion(): void {
+
+    if (
+      !this.articuloEditando ||
+      !this.articuloEditando.id_articulo
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      !this.articuloEditando.nombre.trim() ||
+      !this.articuloEditando.descripcion.trim() ||
+      this.articuloEditando.precio <= 0 ||
+      this.articuloEditando.existencia < 0 ||
+      this.articuloEditando.id_categoria <= 0
+    ) {
+
+      this.toastr.warning(
+        'Completa correctamente todos los campos.',
+        'Datos inválidos'
+      );
+
+      return;
+
+    }
+
+
+    const id = this.articuloEditando.id_articulo;
+
+
+    this.articulosService
+      .actualizarArticulo(
+        id,
+        this.articuloEditando
+      )
+      .subscribe({
+
+        next: (respuesta) => {
+
+          this.toastr.success(
+            respuesta.mensaje,
+            'Artículo actualizado'
+          );
+
+          this.cerrarFormulario();
+
+          this.cargarArticulos();
+
+        },
+
+        error: (error) => {
+
+          console.error(error);
+
+          this.toastr.error(
+            error.error?.mensaje ||
+            'No se pudo actualizar el artículo',
+            'Error'
+          );
+
+        }
+
+      });
+
+  }
+
+
+  // =========================
+  // DESACTIVAR
+  // =========================
+
+  confirmarEliminacion(
+    id: number | undefined
+  ): void {
+
+    if (id === undefined) {
       return;
     }
 
-    const articulo = this.articuloForm.value;
-
-    if (this.modoEditar && this.idEditando !== null) {
-      this.servicio.actualizarArticulo(this.idEditando, articulo).subscribe({
-        next: (response) => {
-          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
-          this.obtenerArticulos();
-          this.cancelarEditar();
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Error al actualizar', 'Error');
-        }
-      });
-    } else {
-      this.servicio.crearArticulo(articulo).subscribe({
-        next: (response) => {
-          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
-          this.obtenerArticulos();
-          this.articuloForm.reset();
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Error al crear', 'Error');
-        }
-      });
-    }
-  }
-
-  editarArticulo(articulo: Articulo) {
-    this.modoEditar = true;
-    this.idEditando = articulo.id_articulo!;
-    this.articuloForm.patchValue(articulo);
-  }
-
-  cancelarEditar() {
-    this.modoEditar = false;
-    this.idEditando = null;
-    this.articuloForm.reset();
-  }
-
-  confirmarEliminacionArticulo(id: number): void {
     this.articuloAEliminar = id;
+
   }
 
-  cancelarEliminacionArticulo(): void {
+
+  cancelarEliminacion(): void {
+
     this.articuloAEliminar = null;
+
   }
+
 
   eliminarArticuloConfirmado(): void {
-    if (this.articuloAEliminar !== null) {
-      this.servicio.eliminarArticulo(this.articuloAEliminar).subscribe({
-        next: (response) => {
-          this.obtenerArticulos();
-          this.articuloAEliminar = null;
-          this.toastr.success(response.message, 'Éxito'); // <--- MENSAJE DINÁMICO DEL BACKEND
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Error al eliminar el articulo', 'Error');
-          this.articuloAEliminar = null;
-        }
-      });
+
+    if (this.articuloAEliminar === null) {
+      return;
     }
+
+
+    const id = this.articuloAEliminar;
+
+
+    this.articulosService
+      .desactivarArticulo(id)
+      .subscribe({
+
+        next: (respuesta) => {
+
+          this.toastr.success(
+            respuesta.mensaje,
+            'Artículo desactivado'
+          );
+
+          this.articuloAEliminar = null;
+
+          this.cargarArticulos();
+
+        },
+
+        error: (error) => {
+
+          console.error(error);
+
+          this.toastr.error(
+            error.error?.mensaje ||
+            'No se pudo desactivar el artículo',
+            'Error'
+          );
+
+          this.articuloAEliminar = null;
+
+        }
+
+      });
+
   }
+
 }

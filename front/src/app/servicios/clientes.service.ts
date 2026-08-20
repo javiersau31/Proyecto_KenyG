@@ -1,39 +1,69 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiService } from '../core/services/api.services'; // <--- Cambiado a un solo nivel
-import { ApiResponse } from '../core/models/api-response.model'; // <--- Cambiado a un solo nivel
+import { ApiService } from '../core/services/api.service';
 
 export interface Cliente {
   id_cliente?: number;
   nombre: string;
   direccion: string;
   telefono: string;
-  email: string;
+  correo: string;
+}
+
+export interface RespuestaCliente {
+  mensaje: string;
+  id_cliente?: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientesService {
+
   constructor(private api: ApiService) {}
 
-  getClientes(): Observable<ApiResponse<Cliente[]>> {
+  obtenerClientes(): Observable<Cliente[]> {
     return this.api.get<Cliente[]>('clientes');
   }
 
-  getCliente(id: number): Observable<ApiResponse<Cliente>> {
+  obtenerClientePorId(id: number): Observable<Cliente> {
     return this.api.get<Cliente>(`clientes/${id}`);
   }
 
-  crearCliente(cliente: Partial<Cliente>): Observable<ApiResponse<any>> {
-    return this.api.post<any>('clientes', cliente);
+  crearCliente(
+    datos: Cliente
+  ): Observable<RespuestaCliente> {
+    return this.api.post<RespuestaCliente>(
+      'clientes',
+      datos
+    );
   }
 
-  actualizarCliente(id: number, cliente: Partial<Cliente>): Observable<ApiResponse<any>> {
-    return this.api.put<any>(`clientes/${id}`, cliente);
+  actualizarCliente(
+    id: number,
+    datos: Cliente
+  ): Observable<RespuestaCliente> {
+    return this.api.put<RespuestaCliente>(
+      `clientes/${id}`,
+      datos
+    );
   }
 
-  eliminarCliente(id: number): Observable<ApiResponse<any>> {
-    return this.api.delete<any>(`clientes/${id}`);
+  desactivarCliente(
+    id: number
+  ): Observable<RespuestaCliente> {
+    return this.api.patch<RespuestaCliente>(
+      `clientes/${id}/desactivar`,
+      {}
+    );
+  }
+
+  activarCliente(
+    id: number
+  ): Observable<RespuestaCliente> {
+    return this.api.patch<RespuestaCliente>(
+      `clientes/${id}/activar`,
+      {}
+    );
   }
 }

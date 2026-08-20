@@ -2,9 +2,6 @@
   <div class="text-xl font-semibold flex-1 text-left">Sistema Ventas</div>
   <ul class="flex justify-between space-x-4">
     <li *ngIf="!sesionActiva">
-      <a routerLink="/registro" routerLinkActive="font-bold" class="hover:text-yellow-300">Registro</a>
-    </li>
-    <li *ngIf="!sesionActiva">
       <a routerLink="/login" routerLinkActive="font-bold" class="hover:text-yellow-300">Iniciar Sesion</a>
     </li>
     <li *ngIf="sesionActiva">
@@ -15,6 +12,9 @@
     </li>
     <li *ngIf="sesionActiva">
       <a routerLink="/articulos" routerLinkActive="font-bold" class="hover:text-yellow-300">Articulos</a>
+    </li>
+    <li *ngIf="sesionActiva">
+      <a routerLink="/categorias" routerLinkActive="font-bold" class="hover:text-yellow-300">Categorias</a>
     </li>
     <li *ngIf="sesionActiva">
       <a routerLink="/ventas" routerLinkActive="font-bold" class="hover:text-yellow-300">Ventas</a>

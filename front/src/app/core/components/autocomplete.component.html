@@ -1,63 +1,32 @@
-<div class="relative autocomplete-container">
+<div class="relative w-full">
 
-  <!-- INPUT -->
   <input
     type="text"
-    [(ngModel)]="termino"
-    (ngModelChange)="onInput()"
+    [(ngModel)]="texto"
+    (input)="onInput()"
+    (focus)="onInput()"
     (blur)="cerrar()"
     [placeholder]="placeholder"
-    [disabled]="disabled"
-    class="w-full border rounded-lg px-3 py-2
-         focus:ring-2 focus:ring-[#005EB8]
-         disabled:bg-slate-100 disabled:cursor-not-allowed"
-    
+    class="w-full border border-gray-300 rounded-md px-3 py-2
+           focus:outline-none focus:ring-2 focus:ring-blue-500"
   />
 
-  <!-- DROPDOWN -->
-
   <div
-    *ngIf="mostrar && resultados.length"
-    class="absolute z-50 w-full bg-white border rounded-lg shadow mt-1 max-h-60 overflow-y-auto"
+    *ngIf="mostrar"
+    class="absolute z-50 w-full mt-1 bg-white border border-gray-200
+           rounded-md shadow-lg overflow-hidden"
+  >
+
+    <button
+      *ngFor="let item of resultados"
+      type="button"
+      (mousedown)="seleccionar(item)"
+      class="w-full text-left px-4 py-2 hover:bg-blue-50
+             border-b border-gray-100 last:border-b-0"
     >
-      <ng-container *ngFor="let item of resultados">
+      {{ item[displayField] }}
+    </button>
 
-        <div (click)="seleccionar(item)" class="px-3 py-2 hover:bg-slate-100 cursor-pointer">
-
-          <ng-container
-            *ngTemplateOutlet="itemTemplate ? itemTemplate : defaultTemplate; context: { $implicit: item }">
-          </ng-container>
-
-        </div>
-
-      </ng-container>
   </div>
 
 </div>
-<div
-  *ngIf="mostrar && resultados.length"
-  class="absolute z-50 w-full bg-white border rounded-lg shadow mt-1 max-h-60 overflow-y-auto"
->
-  <ng-container *ngFor="let item of resultados">
-
-    <div
-      (click)="seleccionar(item)"
-      class="px-3 py-2 hover:bg-slate-100 cursor-pointer"
-    >
-
-      <ng-container
-        *ngTemplateOutlet="
-          itemTemplate ? itemTemplate : defaultTemplate;
-          context: { $implicit: item }
-        "
-      >
-      </ng-container>
-
-    </div>
-
-  </ng-container>
-</div>
-
-<ng-template #defaultTemplate let-item>
-  {{ item[labelKey] }}
-</ng-template>

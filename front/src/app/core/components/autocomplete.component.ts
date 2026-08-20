@@ -1,74 +1,63 @@
-import { Component, Input, Output, EventEmitter, ContentChild, TemplateRef, ViewChild, HostListener } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-autocomplete',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './autocomplete.component.html'
 })
 export class AutocompleteComponent {
 
   @Input() items: any[] = [];
-  @Input() labelKey: string = 'nombre';
-  @Input() placeholder: string = 'Buscar...';
-  @Input() disabled: boolean = false;
-  @Input() value: any = null;
+  @Input() placeholder = 'Buscar...';
 
-  @Output() cleared = new EventEmitter<void>();
-  @Output() selected = new EventEmitter<any>();
-  
-  @ContentChild(TemplateRef) itemTemplate!: TemplateRef<any>;
+  @Output() seleccionado = new EventEmitter<any>();
 
-  @ViewChild('defaultTemplate', { static: true })
-    defaultTemplate!: TemplateRef<any>;
-
-  @HostListener('document:click', ['$event'])
-    onClickOutside(event: any) {
-    if (!event.target.closest('.autocomplete-container')) {
-        this.mostrar = false;
-    }
-  }
-
-  termino = '';
-  resultados: any[] = [];
+  texto = '';
   mostrar = false;
+  resultados: any[] = [];
 
-  onInput() {
-      if (this.disabled) return;
+  @Input() displayField = 'nombre';
 
-      const texto = this.termino.toLowerCase();
+  onInput(): void {
 
-      this.resultados = this.items.filter(item =>
-        item[this.labelKey].toLowerCase().includes(texto)
-      ).slice(0, 10);
+    const valor = this.texto.trim().toLowerCase();
 
-      this.mostrar = true;
+    if (!valor) {
+      this.resultados = [];
+      this.mostrar = false;
+      return;
     }
 
-  seleccionar(item: any) {
-    this.termino = item[this.labelKey];
-    this.mostrar = false;
-    this.selected.emit(item);
+    this.resultados = this.items
+      .filter(item => {
+        const texto = item[this.displayField];
+
+        return texto &&
+          texto.toString().toLowerCase().includes(valor);
+      })
+      .slice(0, 8);
+
+    this.mostrar = this.resultados.length > 0;
   }
 
-  cerrar() {
-    setTimeout(() => this.mostrar = false, 200);
+  seleccionar(item: any): void {
+
+    this.texto = item[this.displayField];
+
+    this.mostrar = false;
+
+    this.seleccionado.emit(item);
   }
 
-  ngOnChanges() {
-        if (this.value) {
-        this.termino = this.value[this.labelKey] || '';
-      }
-        if (!this.termino) {
-        this.resultados = this.items;
-      }
-    }
-
-  reset() {
-    this.termino = '';
-    this.resultados = [];
-    this.mostrar = false;
+  cerrar(): void {
+    setTimeout(() => {
+      this.mostrar = false;
+    }, 150);
   }
 }

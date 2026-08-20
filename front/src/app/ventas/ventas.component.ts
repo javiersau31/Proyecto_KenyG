@@ -1,229 +1,423 @@
 import { Component, OnInit } from '@angular/core';
-import { VentasService, Cliente } from '../servicios/ventas.service'; 
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { AutocompleteComponent } from '../core/components/autocomplete.component';
+import {
+  VentasService,
+  Venta,
+  DetalleVenta
+} from '../servicios/ventas.service';
+
+import {
+  ClientesService,
+  Cliente
+} from '../servicios/clientes.service';
+
+import {
+  ArticulosService,
+  Articulo
+} from '../servicios/articulos.service';
 
 @Component({
   selector: 'app-ventas',
   standalone: true,
-  imports: [CommonModule, FormsModule],  
-  templateUrl: './ventas.component.html',
+  imports: [
+    CommonModule,
+    FormsModule,
+    AutocompleteComponent
+  ],
+  templateUrl: './ventas.component.html'
 })
 export class VentasComponent implements OnInit {
+
+  ventas: Venta[] = [];
   clientes: Cliente[] = [];
-  articulos: any[] = [];
+  articulos: Articulo[] = [];
+  textoArticulo = '';
+  articulosFiltrados: Articulo[] = [];
+  mostrarArticulos = false;
 
   ventaSeleccionada: number | null = null;
-  id_clienteSeleccionado: number | null = null;
-  id_admin: number = 1; 
+  detallesVenta: DetalleVenta[] = [];
 
-  ventas: any[] = [];
-  detallesVenta: any[] = [];
+  idClienteSeleccionado: number | null = null;
 
   mostrarFormulario = false;
-  modoEdicion: { [id_detalle: number]: boolean } = {};
+
   ventaAEliminar: number | null = null;
+
+  modoEdicion: { [id: number]: boolean } = {};
+
   
+
   detalle = {
-    id_articulo: null,
-    nombre: null,
-    cantidad: null,
-    precio_u: null
+    id_articulo: null as number | null,
+    cantidad: null as number | null,
+    precio_unitario: null as number | null
   };
 
-  constructor(private api: VentasService, private toastr: ToastrService) {}
+  constructor(
+    private ventasService: VentasService,
+    private clientesService: ClientesService,
+    private articulosService: ArticulosService,
+    private toastr: ToastrService,
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.cargarVentas();
-    
-    // Cargar artículos usando la API global
-    this.api.getarticulos().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.articulos = response.data;
-          console.log('Artículos cargados:', response.data);
-        }
+    this.cargarClientes();
+    this.cargarArticulos();
+  }
+
+  
+  // =========================
+  // CARGAR DATOS
+  // =========================
+
+  cargarVentas(): void {
+
+    this.ventasService.obtenerVentas().subscribe({
+      next: (ventas) => {
+        this.ventas = ventas;
       },
+
       error: (err) => {
-        this.toastr.error(err.error?.message || 'Error al cargar artículos', 'Error');
+        console.error(err);
+        this.toastr.error(
+          err.error?.mensaje || 'Error al cargar las ventas',
+          'Error'
+        );
       }
     });
 
-    // Cargar clientes usando la API global
-    this.api.getClientes().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.clientes = response.data;
-        }
+  }
+
+  cargarClientes(): void {
+
+    this.clientesService.obtenerClientes().subscribe({
+      next: (clientes) => {
+        this.clientes = clientes;
       },
+
       error: (err) => {
-        this.toastr.error(err.error?.message || 'Error al cargar clientes', 'Error');
+        console.error(err);
+        this.toastr.error(
+          err.error?.mensaje || 'Error al cargar los clientes',
+          'Error'
+        );
       }
     });
+
   }
 
-  onArticuloChange() {
-    const articuloSeleccionado = this.articulos.find(
-      a => a.id_articulo === this.detalle.id_articulo
-    );
-    if (articuloSeleccionado) {
-      this.detalle.precio_u = articuloSeleccionado.precio;
-    } else {
-      this.detalle.precio_u = null;
-    }
+  cargarArticulos(): void {
+
+    this.articulosService.obtenerArticulos().subscribe({
+      next: (articulos) => {
+        this.articulos = articulos;
+      },
+
+      error: (err) => {
+        console.error(err);
+        this.toastr.error(
+          err.error?.mensaje || 'Error al cargar los artículos',
+          'Error'
+        );
+      }
+    });
+
   }
 
-  crearVenta() {
-    if (!this.id_clienteSeleccionado) {
-      this.toastr.warning('Por favor, selecciona un cliente.', 'Advertencia');
+  // =========================
+  // VENTA
+  // =========================
+
+  crearVenta(): void {
+
+    if (!this.idClienteSeleccionado) {
+
+      this.toastr.warning(
+        'Selecciona un cliente.',
+        'Advertencia'
+      );
+
       return;
     }
 
-    this.api.crearVenta(this.id_admin, this.id_clienteSeleccionado).subscribe({
+    this.ventasService.crearVenta({
+      id_cliente: this.idClienteSeleccionado
+    }).subscribe({
+
       next: (response) => {
-        this.toastr.success(response.message || 'Venta creada con éxito', 'Éxito');
+
+        this.toastr.success(
+          response.mensaje || 'Venta creada correctamente.',
+          'Éxito'
+        );
+
+        this.idClienteSeleccionado = null;
         this.mostrarFormulario = false;
+
         this.cargarVentas();
       },
-      error: (error) => {
-        this.toastr.error(error.error?.message || 'Error al crear la venta', 'Error');
-        console.error('Error al crear la venta:', error);
-      }
-    });
-  }
 
-  cargarVentas() {
-    this.api.getventas().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.ventas = response.data;
-          console.log('Ventas cargadas:', response.data);
-        }
-      },
       error: (err) => {
-        this.toastr.error(err.error?.message || 'Error al cargar las ventas', 'Error');
+
+        console.error(err);
+
+        this.toastr.error(
+          err.error?.mensaje || 'Error al crear la venta.',
+          'Error'
+        );
+
       }
+
     });
+
   }
 
-  abrirModalDetalle(id_venta: number) {
-    if (this.ventaSeleccionada === id_venta) {
-      this.ventaSeleccionada = null; 
+  // =========================
+  // DETALLES
+  // =========================
+
+  verDetalles(idVenta: number): void {
+
+    if (this.ventaSeleccionada === idVenta) {
+
+      this.ventaSeleccionada = null;
       this.detallesVenta = [];
-    } else {
-      this.ventaSeleccionada = id_venta; 
-      this.api.getDetallesVenta(id_venta).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.detallesVenta = response.data;
-          }
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Error al cargar detalles', 'Error');
-        }
-      });
-    }
 
-    this.detalle = { id_articulo: null, nombre: null, cantidad: null, precio_u: null };
-  }
-
-  agregarDetalle() {
-    if (!this.detalle.id_articulo || this.detalle.cantidad == null) {
-      this.toastr.warning('Por favor, completa todos los campos.', 'Advertencia');
       return;
     }
 
-    if (isNaN(Number(this.detalle.cantidad)) || Number(this.detalle.cantidad) <= 0) {
-      this.toastr.warning('La cantidad debe ser un número válido y mayor a 0.', 'Advertencia');
-      return;
-    }
+    this.ventaSeleccionada = idVenta;
 
-    const detalleCompleto = {
-      id_venta: this.ventaSeleccionada, 
-      ...this.detalle,
-    };
+    this.ventasService.obtenerDetalles(idVenta).subscribe({
 
-    this.api.agregarDetalle(detalleCompleto).subscribe({
-      next: (response) => {
-        this.toastr.success(response.message || 'Detalle agregado con éxito', 'Éxito');
-        this.detalle = { id_articulo: null, nombre: null, cantidad: null, precio_u: null }; 
-        this.cargarVentas(); 
+      next: (detalles) => {
+        this.detallesVenta = detalles;
       },
-      error: (error) => {
-        this.toastr.error(error.error?.message || 'Error al agregar el detalle', 'Error');
-      }
-    });
-  }
 
-  verDetalles(id_venta: number) {
-    this.api.getDetallesVenta(id_venta).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.detallesVenta = response.data;
-          this.ventaSeleccionada = id_venta;
-        }
-      },
       error: (err) => {
-        this.toastr.error(err.error?.message || 'Error al ver detalles', 'Error');
+
+        console.error(err);
+
+        this.toastr.error(
+          err.error?.mensaje || 'Error al cargar los detalles.',
+          'Error'
+        );
+
       }
+
     });
+
   }
 
-  activarEdicion(id_detalle: number) {
-    this.modoEdicion[id_detalle] = true;
-  }
 
-  guardarEdicion(detalle: any) {
-    if (detalle.cantidad == null) {
-      this.toastr.warning('Por favor, completa todos los campos.', 'Advertencia');
+  // =========================
+  // AGREGAR DETALLE
+  // =========================
+
+  agregarDetalle(): void {
+
+    if (!this.ventaSeleccionada) {
+
+      this.toastr.warning(
+        'Selecciona una venta.',
+        'Advertencia'
+      );
+
       return;
     }
 
-    if (isNaN(detalle.cantidad) || isNaN(detalle.precio_u)) {
-      this.toastr.warning('La cantidad y el precio deben ser números válidos.', 'Advertencia');
+    if (
+      !this.detalle.id_articulo ||
+      !this.detalle.cantidad 
+
+    ) {
+
+      this.toastr.warning(
+        'Completa todos los campos.',
+        'Advertencia'
+      );
+
       return;
     }
 
-    if (detalle.cantidad <= 0 || detalle.precio_u <= 0) {
-      this.toastr.warning('La cantidad y el precio deben ser mayores a 0.', 'Advertencia');
+    if (
+      !Number.isInteger(this.detalle.cantidad) ||
+      this.detalle.cantidad <= 0
+    ) {
+      this.toastr.warning(
+        'La cantidad debe ser un número entero mayor a cero.',
+        'Advertencia'
+      );
       return;
-    }
+}
 
-    this.api.editarDetalle(detalle.id_detalle, detalle).subscribe({
+    this.ventasService.agregarDetalle({
+
+      id_venta: this.ventaSeleccionada,
+
+      id_articulo: this.detalle.id_articulo,
+
+      cantidad: this.detalle.cantidad,
+
+    }).subscribe({
+
       next: (response) => {
-        this.toastr.success(response.message || 'Detalle actualizado con éxito', 'Éxito');
-        this.modoEdicion[detalle.id_detalle] = false;
+
+        this.toastr.success(
+          response.mensaje || 'Artículo agregado correctamente.',
+          'Éxito'
+        );
+
+        this.limpiarDetalle();
+
+        this.verDetalles(this.ventaSeleccionada!);
+
         this.cargarVentas();
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+        this.toastr.error(
+          err.error?.mensaje || 'Error al agregar el artículo.',
+          'Error'
+        );
+
+      }
+
+    });
+
+  }
+
+  // =========================
+  // EDITAR DETALLE
+  // =========================
+
+  activarEdicion(idDetalle: number): void {
+    this.modoEdicion[idDetalle] = true;
+  }
+
+  guardarEdicion(detalle: DetalleVenta): void {
+
+  if (
+    !Number.isInteger(detalle.cantidad) ||
+    detalle.cantidad <= 0
+  ) {
+    this.toastr.warning(
+      'La cantidad debe ser un número entero mayor a cero.',
+      'Advertencia'
+    );
+    return;
+  }
+
+  this.ventasService.editarDetalle(
+    detalle.id_detalle,
+    detalle.cantidad
+  ).subscribe({
+    next: (response) => {
+
+      this.toastr.success(
+        response.mensaje || 'Detalle actualizado correctamente.',
+        'Éxito'
+      );
+
+      this.modoEdicion[detalle.id_detalle] = false;
+
+      if (this.ventaSeleccionada) {
+        this.verDetalles(this.ventaSeleccionada);
+      }
+
+      this.cargarVentas();
+    },
+
+    error: (err) => {
+      console.error(err);
+
+      this.toastr.error(
+        err.error?.mensaje || 'Error al actualizar el detalle.',
+        'Error'
+      );
+    }
+  });
+}
+
+  // =========================
+  // ELIMINAR DETALLE
+  // =========================
+
+  eliminarDetalle(idDetalle: number): void {
+
+    if (!confirm('¿Seguro que deseas eliminar este detalle?')) {
+      return;
+    }
+
+    this.ventasService.eliminarDetalle(idDetalle).subscribe({
+
+      next: (response) => {
+
+        this.toastr.success(
+          response.mensaje || 'Detalle eliminado correctamente.',
+          'Éxito'
+        );
+
         if (this.ventaSeleccionada) {
           this.verDetalles(this.ventaSeleccionada);
         }
+
+        this.cargarVentas();
+
       },
+
       error: (err) => {
-        this.toastr.error(err.error?.message || 'Error al actualizar el detalle', 'Error');
+
+        console.error(err);
+
+        this.toastr.error(
+          err.error?.mensaje || 'Error al eliminar el detalle.',
+          'Error'
+        );
+
       }
+
     });
+
   }
 
-  eliminarDetalle(id_detalle: number) {
-    if (confirm('¿Seguro que deseas eliminar este detalle?')) {
-      this.api.eliminarDetalle(id_detalle).subscribe({
-        next: (response) => {
-          this.toastr.success(response.message || 'Detalle eliminado con éxito', 'Éxito');
-          if (this.ventaSeleccionada) {
-            this.verDetalles(this.ventaSeleccionada);
-          }
-          this.cargarVentas();
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Error al eliminar el detalle', 'Error');
-        }
-      });
+  abrirModalDetalle(id_venta: number) {
+  if (this.ventaSeleccionada === id_venta) {
+    this.ventaSeleccionada = null;
+    this.detallesVenta = [];
+    return;
+  }
+
+  this.ventaSeleccionada = id_venta;
+
+  this.ventasService.obtenerDetalles(id_venta).subscribe({
+    next: (detalles) => {
+      this.detallesVenta = detalles;
+    },
+    error: (err) => {
+      this.toastr.error(
+        err.error?.mensaje || 'Error al cargar detalles',
+        'Error'
+      );
     }
-  }
+  });
+}
 
-  confirmarEliminacionVenta(id: number): void {
-    this.ventaAEliminar = id;
+  // =========================
+  // ELIMINAR VENTA
+  // =========================
+
+  confirmarEliminacionVenta(idVenta: number): void {
+    this.ventaAEliminar = idVenta;
   }
 
   cancelarEliminacionVenta(): void {
@@ -231,18 +425,97 @@ export class VentasComponent implements OnInit {
   }
 
   eliminarVentaConfirmada(): void {
-    if (this.ventaAEliminar !== null) {
-      this.api.eliminarVenta(this.ventaAEliminar).subscribe({
-        next: (response) => {
-          this.cargarVentas();
-          this.ventaAEliminar = null;
-          this.toastr.success(response.message || 'Venta eliminada con éxito', 'Éxito');
-        },
-        error: (err) => {
-          this.toastr.error(err.error?.message || 'Error al eliminar la venta', 'Error');
-          this.ventaAEliminar = null;
-        }
-      });
+
+    if (this.ventaAEliminar === null) {
+      return;
     }
+
+    this.ventasService
+      .eliminarVenta(this.ventaAEliminar)
+      .subscribe({
+
+        next: (response) => {
+
+          this.toastr.success(
+            response.mensaje || 'Venta eliminada correctamente.',
+            'Éxito'
+          );
+
+          this.ventaAEliminar = null;
+          this.ventaSeleccionada = null;
+          this.detallesVenta = [];
+
+          this.cargarVentas();
+
+        },
+
+        error: (err) => {
+
+          console.error(err);
+
+          this.toastr.error(
+            err.error?.mensaje || 'Error al eliminar la venta.',
+            'Error'
+          );
+
+          this.ventaAEliminar = null;
+
+        }
+
+      });
+
   }
+
+  // =========================
+  // LIMPIAR FORMULARIO
+  // =========================
+
+  limpiarDetalle(): void {
+
+    this.detalle = {
+      id_articulo: null,
+      cantidad: null,
+      precio_unitario: null
+    };
+
+  }
+
+ seleccionarCliente(cliente: Cliente): void {
+  if (cliente.id_cliente == null) {
+    return;
+  }
+
+  this.idClienteSeleccionado = cliente.id_cliente;
+}
+
+
+buscarArticulos(): void {
+  const texto = this.textoArticulo.trim().toLowerCase();
+
+  if (!texto) {
+    this.articulosFiltrados = [];
+    this.mostrarArticulos = false;
+    return;
+  }
+
+  this.articulosFiltrados = this.articulos.filter(articulo =>
+    articulo.nombre.toLowerCase().includes(texto)
+  );
+
+  this.mostrarArticulos = true;
+}
+
+seleccionarArticulo(articulo: Articulo): void {
+
+if (articulo.id_articulo == undefined) {
+  return;
+}
+  this.detalle.id_articulo = articulo.id_articulo;
+  this.detalle.precio_unitario = articulo.precio;
+
+  this.textoArticulo = articulo.nombre;
+
+  this.articulosFiltrados = [];
+  this.mostrarArticulos = false;
+}
 }
