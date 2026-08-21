@@ -5,6 +5,7 @@
     <div class="flex items-center justify-between gap-6">
 
       <!-- LOGO / NOMBRE -->
+
       <div class="flex items-center gap-3 shrink-0">
 
         <div
@@ -16,6 +17,7 @@
         </div>
 
         <div class="hidden sm:block">
+
           <h1 class="text-lg font-bold text-gray-900 leading-none">
             Sistema Ventas
           </h1>
@@ -23,19 +25,23 @@
           <p class="text-xs text-gray-500 mt-1">
             Gestión administrativa
           </p>
+
         </div>
 
       </div>
 
 
       <!-- NAVEGACIÓN -->
+
       <ul
         *ngIf="sesionActiva"
         class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 overflow-x-auto"
       >
 
         <!-- INICIO -->
+
         <li>
+
           <a
             routerLink="/dashboard"
             routerLinkActive="bg-white text-blue-900 shadow-sm"
@@ -46,10 +52,14 @@
           >
             Inicio
           </a>
+
         </li>
 
-        <!-- USUARIOS -->
-        <li>
+
+        <!-- USUARIOS - SOLO ADMIN -->
+
+        <li *ngIf="authService.esAdmin()">
+
           <a
             routerLink="/usuarios"
             routerLinkActive="bg-white text-blue-900 shadow-sm"
@@ -59,10 +69,14 @@
           >
             Usuarios
           </a>
+
         </li>
 
+
         <!-- CLIENTES -->
+
         <li>
+
           <a
             routerLink="/clientes"
             routerLinkActive="bg-white text-blue-900 shadow-sm"
@@ -72,10 +86,14 @@
           >
             Clientes
           </a>
+
         </li>
 
+
         <!-- ARTÍCULOS -->
+
         <li>
+
           <a
             routerLink="/articulos"
             routerLinkActive="bg-white text-blue-900 shadow-sm"
@@ -85,10 +103,14 @@
           >
             Artículos
           </a>
+
         </li>
 
+
         <!-- CATEGORÍAS -->
+
         <li>
+
           <a
             routerLink="/categorias"
             routerLinkActive="bg-white text-blue-900 shadow-sm"
@@ -98,10 +120,14 @@
           >
             Categorías
           </a>
+
         </li>
 
+
         <!-- VENTAS -->
+
         <li>
+
           <a
             routerLink="/ventas"
             routerLinkActive="bg-white text-blue-900 shadow-sm"
@@ -111,15 +137,18 @@
           >
             Ventas
           </a>
+
         </li>
 
       </ul>
 
 
       <!-- SESIÓN -->
+
       <div class="flex items-center gap-3 shrink-0">
 
         <!-- LOGIN -->
+
         <a
           *ngIf="!sesionActiva"
           routerLink="/login"
@@ -131,7 +160,9 @@
           Iniciar sesión
         </a>
 
+
         <!-- CERRAR SESIÓN -->
+
         <button
           *ngIf="sesionActiva"
           (click)="cerrarSesion()"
@@ -142,6 +173,23 @@
         >
           Cerrar sesión
         </button>
+
+
+        <!-- MI PERFIL -->
+
+        <li *ngIf="sesionActiva">
+
+          <a
+            routerLink="/perfil"
+            routerLinkActive="bg-white text-blue-900 shadow-sm"
+            class="flex items-center px-4 py-2 rounded-lg text-sm font-medium
+                   text-gray-600 hover:text-blue-900 hover:bg-white
+                   transition-all duration-200 whitespace-nowrap"
+          >
+            Mi perfil
+          </a>
+
+        </li>
 
       </div>
 

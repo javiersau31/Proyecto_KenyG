@@ -312,6 +312,16 @@ export class ArticulosComponent implements OnInit {
       ...articulo
     };
 
+    console.log('Artículo recibido:', articulo);
+  console.log('Existencia:', articulo.existencia);
+
+    this.nuevoArticulo = {
+    ...articulo
+  };
+
+  console.log('Artículo para editar:', this.articuloEditando);
+
+
     this.mostrarFormulario = true;
 
   }
@@ -328,73 +338,58 @@ export class ArticulosComponent implements OnInit {
 
   guardarEdicion(): void {
 
-    if (
-      !this.articuloEditando ||
-      !this.articuloEditando.id_articulo
-    ) {
-
-      return;
-
-    }
-
-
-    if (
-      !this.articuloEditando.nombre.trim() ||
-      !this.articuloEditando.descripcion.trim() ||
-      this.articuloEditando.precio <= 0 ||
-      this.articuloEditando.existencia < 0 ||
-      this.articuloEditando.id_categoria <= 0
-    ) {
-
-      this.toastr.warning(
-        'Completa correctamente todos los campos.',
-        'Datos inválidos'
-      );
-
-      return;
-
-    }
-
-
-    const id = this.articuloEditando.id_articulo;
-
-
-    this.articulosService
-      .actualizarArticulo(
-        id,
-        this.articuloEditando
-      )
-      .subscribe({
-
-        next: (respuesta) => {
-
-          this.toastr.success(
-            respuesta.mensaje,
-            'Artículo actualizado'
-          );
-
-          this.cerrarFormulario();
-
-          this.cargarArticulos();
-
-        },
-
-        error: (error) => {
-
-          console.error(error);
-
-          this.toastr.error(
-            error.error?.mensaje ||
-            'No se pudo actualizar el artículo',
-            'Error'
-          );
-
-        }
-
-      });
-
+  if (
+    !this.articuloEditando ||
+    !this.articuloEditando.id_articulo
+  ) {
+    return;
   }
 
+  if (
+    !this.nuevoArticulo.nombre.trim() ||
+    !this.nuevoArticulo.descripcion.trim() ||
+    this.nuevoArticulo.precio <= 0 ||
+    this.nuevoArticulo.existencia < 0 ||
+    this.nuevoArticulo.id_categoria <= 0
+  ) {
+    this.toastr.warning(
+      'Completa correctamente todos los campos.',
+      'Datos inválidos'
+    );
+    return;
+  }
+
+  const id = this.articuloEditando.id_articulo;
+
+  this.articulosService
+    .actualizarArticulo(
+      id,
+      this.nuevoArticulo
+    )
+    .subscribe({
+      next: (respuesta) => {
+
+        this.toastr.success(
+          respuesta.mensaje,
+          'Artículo actualizado'
+        );
+
+        this.cerrarFormulario();
+        this.cargarArticulos();
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+        this.toastr.error(
+          error.error?.mensaje ||
+          'No se pudo actualizar el artículo',
+          'Error'
+        );
+      }
+    });
+}
 
   // =========================
   // DESACTIVAR

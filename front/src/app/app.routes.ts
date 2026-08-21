@@ -9,5 +9,6 @@ export const appRoutes: Routes = [
   {path: 'ventas', loadComponent: () => import('./ventas/ventas.component').then(m => m.VentasComponent) , canActivate: [AuthGuard]   },
   {path: 'clientes', loadComponent: () => import('./clientes/clientes.component').then(m => m.ClientesComponent), canActivate: [AuthGuard]   },
   {path: 'articulos', loadComponent: () => import('./articulos/articulos.component').then(m => m.ArticulosComponent), canActivate: [AuthGuard]},
-  {path: 'categorias', loadComponent: () => import('./categorias/categorias.component').then(m => m.CategoriasComponent), canActivate: [AuthGuard]}, 
+  {path: 'categorias', loadComponent: () => import('./categorias/categorias.component').then(m => m.CategoriasComponent), canActivate: [AuthGuard]},
+  { path: 'perfil', loadComponent: () => import('./perfil/perfil.component').then(m => m.PerfilComponent), canActivate: [AuthGuard]   }, 
 ];
